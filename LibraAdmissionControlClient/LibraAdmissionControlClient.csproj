@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
+    <PackageReference Include="Grpc" Version="1.21.0" />
+    <PackageReference Include="Grpc.Core" Version="1.21.0" />
+    <PackageReference Include="Grpc.Tools" Version="1.21.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+	
+	<Protobuf Include="admission_control.proto" />
+	<Protobuf Include="access_path.proto" />
+	<Protobuf Include="account_state_blob.proto" />
+	<Protobuf Include="events.proto" />
+	<Protobuf Include="get_with_proof.proto" />
+	<Protobuf Include="ledger_info.proto" />
+	<Protobuf Include="mempool_status.proto" />
+	<Protobuf Include="proof.proto" />
+	<Protobuf Include="transaction.proto" />
+	<Protobuf Include="transaction_info.proto" />
+	<Protobuf Include="validator_change.proto" />
+	<Protobuf Include="validator_public_keys.proto" />
+	<Protobuf Include="validator_set.proto" />
+	<Protobuf Include="vm_errors.proto" />
+  </ItemGroup>
+
+</Project>
