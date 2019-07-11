@@ -32,9 +32,8 @@ namespace LibraAdmissionControlClient.Dtos
         {
             _rawTxnBytes = rawTxnBytes;
             RawTransaction rawTr = RawTransaction.Parser.ParseFrom(_rawTxnBytes);
-
+            
             ExpirationTimeUnix = rawTr.ExpirationTime;
-
             ExpirationTime = rawTr.ExpirationTime.UnixTimeStampToDateTime();
 
             GasUnitPrice = rawTr.GasUnitPrice;

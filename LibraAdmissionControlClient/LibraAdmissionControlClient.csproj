@@ -20,6 +20,7 @@
 	<Protobuf Include="events.proto" />
 	<Protobuf Include="get_with_proof.proto" />
 	<Protobuf Include="ledger_info.proto" />
+	<Protobuf Include="mempool.proto" />
 	<Protobuf Include="mempool_status.proto" />
 	<Protobuf Include="proof.proto" />
 	<Protobuf Include="transaction.proto" />
@@ -28,6 +29,18 @@
 	<Protobuf Include="validator_public_keys.proto" />
 	<Protobuf Include="validator_set.proto" />
 	<Protobuf Include="vm_errors.proto" />
+	
+	<Protobuf Include="consensus.proto" />
+	<Protobuf Include="execution.proto" />
+	<Protobuf Include="language_storage.proto" />
+
+	<Protobuf Include="network.proto" />
+	<Protobuf Include="node_debug_interface.proto" />
+	<Protobuf Include="secret_service.proto" />
+	<Protobuf Include="storage.proto" />
+	<Protobuf Include="test.proto" />
+	
+	
   </ItemGroup>
 
 </Project>

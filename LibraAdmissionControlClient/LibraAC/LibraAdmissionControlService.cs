@@ -89,7 +89,7 @@ namespace LibraAdmissionControlClient
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
             var result = await _client.UpdateToLatestLedgerAsync(
                 updateToLatestLedgerRequest, new Metadata());
-
+            
             List<CustomRawTransaction> retList = new List<CustomRawTransaction>();
             foreach (var item in result.ResponseItems)
                 return item.GetTransactionsResponse.TxnListWithProof;

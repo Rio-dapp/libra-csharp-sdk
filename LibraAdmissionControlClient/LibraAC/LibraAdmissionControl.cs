@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using LibraAdmissionControlClient.Dtos;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,6 +76,42 @@ namespace LibraAdmissionControlClient
             }
             return retList;
         }
+
+        public async Task<CustomTransactionFullInfo> GetTransactionAsync(
+         ulong trxVersion)
+        {
+            var transactions = await _service.GetTransactionsAsync(trxVersion, 1);
+
+            CustomTransactionFullInfo ret = new CustomTransactionFullInfo();
+
+            if (transactions == null)
+                return ret;
+            var transaction = transactions.Transactions.FirstOrDefault();
+
+            var customRawTransaction = new CustomRawTransaction(
+                transaction.RawTxnBytes.ToByteArray());
+            ret.RawTransaction = customRawTransaction;
+            ret.Version = transactions.FirstTransactionVersion.Value;
+            ret.SenderPublicKey = transaction.SenderPublicKey.ToByteArray().ByteArryToString();
+            ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
+           
+            var infos = transactions.Infos;
+
+            if (infos != null &&
+                infos.Any())
+            {
+                ret.GasUsed = infos.FirstOrDefault().GasUsed;
+            }
+            else
+            {
+                ret.GasUsed = 0;
+            }
+
+
+            return ret;
+        }
+
+
 
         public async Task<CustomRawTransaction> GetTransactionsBySequenceNumberAsync(
            string address, ulong sequenceNumber)

@@ -16,7 +16,7 @@ namespace Examples.CLI
             ///---------------------
             /// GetAccountInfo
             ///---------------------
-            var address = "881852936f0d63b3bb53463355df27a5b89a76cc8a09e269062c76dbb0f58e6a";
+            var address = "0000000000000000000000000000000000000000000000000000000000000000";
             var account = service.GetAccountInfoAsync(address).Result;
             Console.WriteLine(account.Balance);
 
@@ -31,7 +31,7 @@ namespace Examples.CLI
             ///---------------------
             /// GetTransactions by Seqenc number
             ///---------------------
-            address = "881852936f0d63b3bb53463355df27a5b89a76cc8a09e269062c76dbb0f58e6a";
+            address = "0000000000000000000000000000000000000000000000000000000000000000";
             var trx = service.GetTransactionsBySequenceNumberAsync(address, 0).Result;
             Console.WriteLine("Receiver = {0}, Amount = {1}", trx.Receiver, trx.Amount);
 
