@@ -17,6 +17,7 @@ Get Account Info as in example below. GetAccountInfoAsync returns CustomAccountR
 
 ```csharp
 LibraAdmissionControl service = new LibraAdmissionControl();
+
 var address = "0000000000000000000000000000000000000000000000000000000000000000";
 CustomAccountResource account = service.GetAccountInfoAsync(address).Result;
 Console.WriteLine(account.Balance);
@@ -25,6 +26,7 @@ or
 
 ```csharp
 LibraAdmissionControl service = new LibraAdmissionControl();
+
 var address = "0000000000000000000000000000000000000000000000000000000000000000";
 CustomAccountResource account = await service.GetAccountInfoAsync(address);
 Console.WriteLine(account.Balance);
@@ -34,6 +36,7 @@ Console.WriteLine(account.Balance);
 
 ```csharp
 LibraAdmissionControlService service = new LibraAdmissionControlService("ac.testnet.libra.org",8000);
+
 var address = "0000000000000000000000000000000000000000000000000000000000000000";
 AccountStateWithProof account = await service.GetAccountInfoAsync(address);
 Console.WriteLine(account.Proof);
