@@ -49,6 +49,6 @@ AccountStateWithProof account = await service.GetAccountInfoAsync(address);
 Console.WriteLine(account.Proof);
 ```
 
-## This Sdk is used in the followwing example:
+## This Sdk is used in the following example:
 [libraview.org](https://libraview.org)
 
