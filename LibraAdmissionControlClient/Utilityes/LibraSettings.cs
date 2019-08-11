@@ -10,7 +10,7 @@ namespace LibraAdmissionControlClient
         public static readonly string AssetType = "217da6c6b3e19f1825cfb2676daecce3bf3de03cf26647c78df00b371b25cc97";
 
         public static byte[] AssetTypeBytes { get{
-                return AssetType.StringToByteArray();
+                return AssetType.HexStringToByteArray();
             } }
     }
 }

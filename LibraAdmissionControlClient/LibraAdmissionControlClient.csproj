@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="dotnetstandard-bip32" Version="1.0.0" />
     <PackageReference Include="Google.Protobuf" Version="3.8.0" />
     <PackageReference Include="Grpc" Version="1.21.0" />
     <PackageReference Include="Grpc.Core" Version="1.21.0" />
@@ -13,6 +14,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="NSec.Cryptography" Version="19.5.0" />
+    <PackageReference Include="Waher.Security.SHA3" Version="1.0.1" />
 	
 	<Protobuf Include="admission_control.proto" />
 	<Protobuf Include="access_path.proto" />
@@ -21,24 +24,16 @@
 	<Protobuf Include="get_with_proof.proto" />
 	<Protobuf Include="ledger_info.proto" />
 	<Protobuf Include="mempool.proto" />
-	<Protobuf Include="mempool_status.proto" />
+	<Protobuf Include="shared/mempool_status.proto" />
 	<Protobuf Include="proof.proto" />
 	<Protobuf Include="transaction.proto" />
 	<Protobuf Include="transaction_info.proto" />
 	<Protobuf Include="validator_change.proto" />
 	<Protobuf Include="validator_public_keys.proto" />
 	<Protobuf Include="validator_set.proto" />
+	<Protobuf Include="language_storage.proto" />
 	<Protobuf Include="vm_errors.proto" />
 	
-	<Protobuf Include="consensus.proto" />
-	<Protobuf Include="execution.proto" />
-	<Protobuf Include="language_storage.proto" />
-
-	<Protobuf Include="network.proto" />
-	<Protobuf Include="node_debug_interface.proto" />
-	<Protobuf Include="secret_service.proto" />
-	<Protobuf Include="storage.proto" />
-	<Protobuf Include="test.proto" />
 	
 	
   </ItemGroup>

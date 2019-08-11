@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 using static AdmissionControl.AdmissionControl;
 using Types;
 using System;
+using Google.Protobuf;
+
+using System.Security.Cryptography;
+using NSec.Cryptography;
+using Waher.Security.SHA3;
+using LibraAdmissionControlClient.Utilityes;
 
 namespace LibraAdmissionControlClient
 {
@@ -38,7 +44,7 @@ namespace LibraAdmissionControlClient
         {
             get { return _client; }
         }
-      
+
         /// <summary>
         /// The Main method Initialize
         /// </summary>
@@ -55,7 +61,7 @@ namespace LibraAdmissionControlClient
             var updateToLatestLedgerRequest = new Types.UpdateToLatestLedgerRequest();
             var requestItem = new Types.RequestItem();
             var asr = new Types.GetAccountStateRequest();
-            asr.Address = Google.Protobuf.ByteString.CopyFrom(address.StringToByteArray());
+            asr.Address = Google.Protobuf.ByteString.CopyFrom(address.HexStringToByteArray());
             requestItem.GetAccountStateRequest = asr;
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
 
@@ -89,7 +95,7 @@ namespace LibraAdmissionControlClient
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
             var result = await _client.UpdateToLatestLedgerAsync(
                 updateToLatestLedgerRequest, new Metadata());
-            
+
             List<CustomRawTransaction> retList = new List<CustomRawTransaction>();
             foreach (var item in result.ResponseItems)
                 return item.GetTransactionsResponse.TxnListWithProof;
@@ -105,7 +111,7 @@ namespace LibraAdmissionControlClient
             var tansactionRequest = new GetAccountTransactionBySequenceNumberRequest();
             requestItem.GetAccountTransactionBySequenceNumberRequest = tansactionRequest;
             tansactionRequest.Account =
-                Google.Protobuf.ByteString.CopyFrom(address.StringToByteArray());
+                Google.Protobuf.ByteString.CopyFrom(address.HexStringToByteArray());
             tansactionRequest.SequenceNumber = sequenceNumber;
             tansactionRequest.FetchEvents = true;
 
@@ -117,6 +123,32 @@ namespace LibraAdmissionControlClient
                 return item.GetAccountTransactionBySequenceNumberResponse.SignedTransactionWithProof;
 
             return null;
+        }
+
+
+        public async Task<AdmissionControl.SubmitTransactionResponse>SendTransactionAsync(
+            byte[] privateKey, RawTransaction rawTransaction)
+        {
+            var bytesTrx = rawTransaction.ToByteArray();
+            LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
+            var hash = libraHasher.GetHash(bytesTrx);
+
+            var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey, KeyBlobFormat.RawPrivateKey);
+
+            AdmissionControl.SubmitTransactionRequest req = 
+                new AdmissionControl.SubmitTransactionRequest();
+
+            req.SignedTxn = new SignedTransaction();
+            req.SignedTxn.RawTxnBytes = ByteString.CopyFrom(bytesTrx);
+            req.SignedTxn.SenderPublicKey = 
+                ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
+            var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
+            req.SignedTxn.SenderSignature = ByteString.CopyFrom(sig);
+
+            var result = await _client.SubmitTransactionAsync(
+                 req, new Metadata());
+
+            return result;
         }
 
         public void Shutdown()

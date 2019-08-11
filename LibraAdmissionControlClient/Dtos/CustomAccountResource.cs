@@ -19,6 +19,7 @@ namespace LibraAdmissionControlClient.Dtos
         public ulong SentEventsCount { get; set; }
         public ulong ReceivedEventsCount { get; set; }
 
+        public byte[] Blob { get { return _rawBytes; } }
         byte[] _rawBytes;
 
         public CustomAccountResource()
@@ -40,18 +41,24 @@ namespace LibraAdmissionControlClient.Dtos
 
             int startIndex = GetAssetTypeStartIndex();
 
-            //AssetType = BitConverter.ToString(_rawBytes.SubArray(9, 32)).Replace("-", "");//9, 40
+            // .encode_struct(&self.authentication_key)?
+            // .encode_u64(self.balance)?
+            // .encode_bool(self.delegated_withdrawal_capability)?
+            // .encode_u64(self.received_events_count)?
+            // .encode_u64(self.sent_events_count)?
+            // .encode_u64(self.sequence_number) ?;
+
             AssetType = LibraSettings.AssetType;
             startIndex += 9;
-            AuthenticationKey = BitConverter.ToString(_rawBytes.SubArray(startIndex, 32)).Replace("-", "").ToLower();//SubArray(49, 32) 49, 80
-            startIndex += 32;
-            Balance = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));//SubArray(81, 8) 81, 88
+            AuthenticationKey = BitConverter.ToString(_rawBytes.SubArray(startIndex, 32)).Replace("-", "").ToLower();
+            startIndex += 33;// 32+1 self.delegated_withdrawal_capability
+            Balance = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
             startIndex += 8;
-            ReceivedEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));//SubArray(89, 8) 89, 96
+            ReceivedEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
             startIndex += 8;
-            SentEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));//SubArray(97, 8) 97, 104
+            SentEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
             startIndex += 8;
-            SequenceNumber = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));//SubArray(105, 8) 105, 112
+            SequenceNumber = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
         }
 
         private int GetAssetTypeStartIndex()

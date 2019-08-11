@@ -11,6 +11,13 @@ git clone https://github.com/Rio-dapp/libra-csharp-sdk.git
 2. Open **Example.sln** in Visual Studio 2017 or another IDE. This project use [**.Net Core 2.2**](https://dotnet.microsoft.com/download/dotnet-core/2.2)
 3. Select **Examples.CLI** and press **F5**.
 
+## Possibilities
+
+1. Get Account Info
+2. Get Transactions
+3. Get Transactions by Seqenc number
+4. Send Transaction
+
 ## Example
 
 Get Account Info as in example below. GetAccountInfoAsync returns CustomAccountResource object. It is processed data.

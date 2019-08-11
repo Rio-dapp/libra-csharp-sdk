@@ -10,12 +10,14 @@ namespace LibraAdmissionControlClient
         public static readonly string MainAdress =
                     "0000000000000000000000000000000000000000000000000000000000000000";
 
+        public static readonly byte[] PtPTrxBytecode = new byte[] { 76, 73, 66, 82, 65, 86, 77, 10, 1, 0, 7, 1, 74, 0, 0, 0, 4, 0, 0, 0, 3, 78, 0, 0, 0, 6, 0, 0, 0, 12, 84, 0, 0, 0, 6, 0, 0, 0, 13, 90, 0, 0, 0, 6, 0, 0, 0, 5, 96, 0, 0, 0, 41, 0, 0, 0, 4, 137, 0, 0, 0, 32, 0, 0, 0, 7, 169, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 1, 3, 0, 2, 0, 2, 4, 2, 0, 3, 0, 3, 2, 4, 2, 6, 60, 83, 69, 76, 70, 62, 12, 76, 105, 98, 114, 97, 65, 99, 99, 111, 117, 110, 116, 4, 109, 97, 105, 110, 15, 112, 97, 121, 95, 102, 114, 111, 109, 95, 115, 101, 110, 100, 101, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 4, 0, 12, 0, 12, 1, 17, 1, 0, 2 };
+
         public static bool IsAddress(string adress)
         {
             if (string.IsNullOrEmpty(adress))
                 return false;
 
-            var arry = adress.StringToByteArray();
+            var arry = adress.HexStringToByteArray();
             if (arry.Length != 32)
                 return false;
 
@@ -29,7 +31,7 @@ namespace LibraAdmissionControlClient
             return result;
         }
 
-        public static byte[] StringToByteArray(this string hex)
+        public static byte[] HexStringToByteArray(this string hex)
         {
             return Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)

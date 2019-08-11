@@ -5,6 +5,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Types;
+using Google.Protobuf;
 
 namespace LibraAdmissionControlClient
 {
@@ -23,6 +25,7 @@ namespace LibraAdmissionControlClient
             get { return _port; }
         }
 
+        public LibraAdmissionControlService AdmissionControlService { get { return _service; } }
         private LibraAdmissionControlService _service;
         public LibraAdmissionControl()
         {
@@ -55,26 +58,55 @@ namespace LibraAdmissionControlClient
         {
             var account = await _service.GetAccountInfoAsync(address);
             var blob = account.Blob.Blob.ToByteArray();
+            Console.WriteLine("blob - " + blob.ByteArryToString());
             return new CustomAccountResource(blob); ;
         }
 
-        public async Task<IEnumerable<CustomRawTransaction>> GetTransactionsAsync(
+        public async Task<IEnumerable<CustomTransactionFullInfo>> GetTransactionsAsync(
             ulong startVersion, ulong limit)
         {
             var transactions = await _service.GetTransactionsAsync(startVersion, limit);
 
-            List<CustomRawTransaction> retList = new List<CustomRawTransaction>();
+            List<CustomTransactionFullInfo> retList = new List<CustomTransactionFullInfo>();
 
             if (transactions == null)
                 return retList;
 
-            foreach (var transaction in transactions.Transactions)
+            for (int i = 0; i < transactions.Transactions.Count; i++)
             {
-                var customRawTransaction = new CustomRawTransaction(
-                    transaction.RawTxnBytes.ToByteArray());
-                retList.Add(customRawTransaction);
+                var transaction = transactions.Transactions[i];
+                var info = transactions.Infos[i];
+
+                CustomTransactionFullInfo ret = GetCustomTransactionFullInfo(transaction,
+                    info);
+                ret.Version = startVersion + (ulong)i;
+                retList.Add(ret);
             }
+
+
             return retList;
+        }
+
+        private CustomTransactionFullInfo GetCustomTransactionFullInfo(SignedTransaction transaction,
+            TransactionInfo info)
+        {
+            CustomTransactionFullInfo ret = new CustomTransactionFullInfo();
+
+            if (transaction == null)
+                return ret;
+
+            var customRawTransaction = new CustomRawTransaction(
+                transaction.RawTxnBytes.ToByteArray());
+            ret.RawTransaction = customRawTransaction;
+            ret.SenderPublicKey = transaction.SenderPublicKey.ToByteArray().ByteArryToString();
+            ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
+            if (info != null)
+                ret.GasUsed = info.GasUsed;
+            else
+                ret.GasUsed = 0;
+
+            return ret;
+
         }
 
         public async Task<CustomTransactionFullInfo> GetTransactionAsync(
@@ -82,32 +114,10 @@ namespace LibraAdmissionControlClient
         {
             var transactions = await _service.GetTransactionsAsync(trxVersion, 1);
 
-            CustomTransactionFullInfo ret = new CustomTransactionFullInfo();
-
-            if (transactions == null)
-                return ret;
-            var transaction = transactions.Transactions.FirstOrDefault();
-
-            var customRawTransaction = new CustomRawTransaction(
-                transaction.RawTxnBytes.ToByteArray());
-            ret.RawTransaction = customRawTransaction;
+            CustomTransactionFullInfo ret = GetCustomTransactionFullInfo(
+                transactions.Transactions.FirstOrDefault(),
+                transactions.Infos.FirstOrDefault());
             ret.Version = transactions.FirstTransactionVersion.Value;
-            ret.SenderPublicKey = transaction.SenderPublicKey.ToByteArray().ByteArryToString();
-            ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
-           
-            var infos = transactions.Infos;
-
-            if (infos != null &&
-                infos.Any())
-            {
-                ret.GasUsed = infos.FirstOrDefault().GasUsed;
-            }
-            else
-            {
-                ret.GasUsed = 0;
-            }
-
-
             return ret;
         }
 
@@ -126,6 +136,49 @@ namespace LibraAdmissionControlClient
             var customRawTransaction = new CustomRawTransaction(
                 trx.RawTxnBytes.ToByteArray());
             return customRawTransaction;
+        }
+
+        public async Task<string> SendTransaction(
+          byte[] privateKey, RawTransaction rawTransaction)
+        {
+
+            var result = await _service.SendTransactionAsync(privateKey, rawTransaction);
+            return result.ToString();
+
+        }
+
+        public async Task<string> SendTransactionPtoP(
+          byte[] senderPrivateKey, string sender, string reciver, ulong amount)
+        {
+            var senderAccount = await GetAccountInfoAsync(sender);
+
+            RawTransaction rawTr = new RawTransaction()
+            {
+                ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60).ToUnixTimeSeconds(),
+                GasUnitPrice = 0,
+                MaxGasAmount = 29925,
+                SequenceNumber = senderAccount.SequenceNumber
+            };
+
+            rawTr.Program = new Program();
+            rawTr.Program.Code = ByteString.CopyFrom(Utility.PtPTrxBytecode);
+
+            rawTr.Program.Arguments.Add(new TransactionArgument()
+            {
+                Type = TransactionArgument.Types.ArgType.Address,
+                Data = ByteString.CopyFrom(reciver.HexStringToByteArray())
+            });
+
+            rawTr.Program.Arguments.Add(new TransactionArgument()
+            {
+                Type = TransactionArgument.Types.ArgType.U64,
+                Data = ByteString.CopyFrom(BitConverter.GetBytes(amount))
+            });
+
+            rawTr.SenderAccount = ByteString.CopyFrom(sender.HexStringToByteArray());
+
+            var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
+            return result.ToString();
         }
 
         public void Dispose()
