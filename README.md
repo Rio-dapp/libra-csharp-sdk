@@ -52,4 +52,3 @@ Console.WriteLine(account.Proof);
 ## This Sdk is used in the followwing example:
 [libraview.org](https://libraview.org)
 
-## TODO
