@@ -51,9 +51,9 @@ namespace LibraAdmissionControlClient.Dtos
             AssetType = LibraSettings.AssetType;
             startIndex += 9;
             AuthenticationKey = BitConverter.ToString(_rawBytes.SubArray(startIndex, 32)).Replace("-", "").ToLower();
-            startIndex += 33;// 32+1 self.delegated_withdrawal_capability
+            startIndex += 32;
             Balance = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
-            startIndex += 8;
+            startIndex += 9;// 8+1 self.delegated_withdrawal_capability
             ReceivedEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
             startIndex += 8;
             SentEventsCount = BitConverter.ToUInt64(_rawBytes.SubArray(startIndex, 8));
