@@ -13,40 +13,20 @@ git clone https://github.com/Rio-dapp/libra-csharp-sdk.git
 
 ## Possibilities
 
-1. Get Account Info
-2. Get Transactions
-3. Get Transactions by Seqenc number
-4. Send Transaction
+1. LCS example
 
 ## Example
 
-Get Account Info as in example below. GetAccountInfoAsync returns CustomAccountResource object. It is processed data.
-
 ```csharp
-LibraAdmissionControl service = new LibraAdmissionControl();
-
-var address = "0000000000000000000000000000000000000000000000000000000000000000";
-CustomAccountResource account = service.GetAccountInfoAsync(address).Result;
-Console.WriteLine(account.Balance);
-```
-or
-
-```csharp
-LibraAdmissionControl service = new LibraAdmissionControl();
-
-var address = "0000000000000000000000000000000000000000000000000000000000000000";
-CustomAccountResource account = await service.GetAccountInfoAsync(address);
-Console.WriteLine(account.Balance);
-```
-
-## If you want to get original Raw data use the LibraAdmissionControlService:
-
-```csharp
-LibraAdmissionControlService service = new LibraAdmissionControlService("ac.testnet.libra.org",8000);
-
-var address = "0000000000000000000000000000000000000000000000000000000000000000";
-AccountStateWithProof account = await service.GetAccountInfoAsync(address);
-Console.WriteLine(account.Proof);
+///---------------------
+            /// LCS example with program
+            ///---------------------
+            byte[] trxWithProgram = "200000003A24A61E05D129CACE9E0EFC8BC9E33831FEC9A9BE66F50FD352A2638A49B9EE200000000000000000000000040000006D6F766502000000020000000900000043414645204430304402000000090000006361666520643030640300000001000000CA02000000FED0010000000D1027000000000000204E0000000000008051010000000000"
+                 .ToLower().HexStringToByteArray();
+            int corsor = 0;
+            RawTransactionLCS rawTransactionLCS
+                = trxWithProgram.LCSerialization<RawTransactionLCS>(ref corsor);
+            Console.WriteLine("with program = " + rawTransactionLCS);
 ```
 
 ## This Sdk is used in the followwing example:
