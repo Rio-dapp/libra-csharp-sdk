@@ -21,12 +21,11 @@ git clone https://github.com/Rio-dapp/libra-csharp-sdk.git
 ///---------------------
 /// LCS example with program
 ///---------------------
-            byte[] trxWithProgram = "200000003A24A61E05D129CACE9E0EFC8BC9E33831FEC9A9BE66F50FD352A2638A49B9EE200000000000000000000000040000006D6F766502000000020000000900000043414645204430304402000000090000006361666520643030640300000001000000CA02000000FED0010000000D1027000000000000204E0000000000008051010000000000"
+byte[] trxWithProgram = "200000003A24A61E05D129CACE9E0EFC8BC9E33831FEC9A9BE66F50FD352A2638A49B9EE200000000000000000000000040000006D6F766502000000020000000900000043414645204430304402000000090000006361666520643030640300000001000000CA02000000FED0010000000D1027000000000000204E0000000000008051010000000000"
                  .ToLower().HexStringToByteArray();
-            int corsor = 0;
-            RawTransactionLCS rawTransactionLCS
-                = trxWithProgram.LCSerialization<RawTransactionLCS>(ref corsor);
-            Console.WriteLine("with program = " + rawTransactionLCS);
+int corsor = 0;
+RawTransactionLCS rawTransactionLCS = trxWithProgram.LCSerialization<RawTransactionLCS>(ref corsor);
+Console.WriteLine("with program = " + rawTransactionLCS);
 ```
 
 ## This Sdk is used in the followwing example:
