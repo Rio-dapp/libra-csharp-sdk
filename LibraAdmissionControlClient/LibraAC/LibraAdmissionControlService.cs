@@ -56,12 +56,14 @@ namespace LibraAdmissionControlClient
             _client = new AdmissionControlClient(_channel);
         }
 
-        public async Task<Types.AccountStateWithProof> GetAccountInfoAsync(string address)
+        public async Task<Types.AccountStateWithProof> GetAccountInfoAsync(
+            string address)
         {
             var updateToLatestLedgerRequest = new Types.UpdateToLatestLedgerRequest();
             var requestItem = new Types.RequestItem();
             var asr = new Types.GetAccountStateRequest();
-            asr.Address = Google.Protobuf.ByteString.CopyFrom(address.HexStringToByteArray());
+            asr.Address = Google.Protobuf.ByteString.CopyFrom(
+                address.HexStringToByteArray());
             requestItem.GetAccountStateRequest = asr;
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
 
@@ -89,12 +91,15 @@ namespace LibraAdmissionControlClient
             var tansactionRequest = new GetTransactionsRequest();
             requestItem.GetTransactionsRequest = tansactionRequest;
             tansactionRequest.StartVersion = startVersion;
+
             tansactionRequest.Limit = limit;
-            tansactionRequest.FetchEvents = true;
+           // tansactionRequest.FetchEvents = true;
 
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
             var result = await _client.UpdateToLatestLedgerAsync(
                 updateToLatestLedgerRequest, new Metadata());
+            Console.WriteLine("result = " + result.ResponseItems.Count);
+            Console.WriteLine("result = " + result.ResponseItems.FirstOrDefault());
 
             List<CustomRawTransaction> retList = new List<CustomRawTransaction>();
             foreach (var item in result.ResponseItems)
@@ -103,13 +108,15 @@ namespace LibraAdmissionControlClient
             return null;
         }
 
-        public async Task<Types.SignedTransactionWithProof> GetTransactionsBySequenceNumberAsync(
+        public async Task<Types.SignedTransactionWithProof> 
+            GetTransactionsBySequenceNumberAsync(
            string address, ulong sequenceNumber)
         {
             var updateToLatestLedgerRequest = new Types.UpdateToLatestLedgerRequest();
             var requestItem = new Types.RequestItem();
             var tansactionRequest = new GetAccountTransactionBySequenceNumberRequest();
-            requestItem.GetAccountTransactionBySequenceNumberRequest = tansactionRequest;
+            requestItem.GetAccountTransactionBySequenceNumberRequest 
+                = tansactionRequest;
             tansactionRequest.Account =
                 Google.Protobuf.ByteString.CopyFrom(address.HexStringToByteArray());
             tansactionRequest.SequenceNumber = sequenceNumber;
@@ -120,36 +127,39 @@ namespace LibraAdmissionControlClient
                 updateToLatestLedgerRequest, new Metadata());
 
             foreach (var item in result.ResponseItems)
-                return item.GetAccountTransactionBySequenceNumberResponse.SignedTransactionWithProof;
+                return item.GetAccountTransactionBySequenceNumberResponse
+                    .SignedTransactionWithProof;
 
             return null;
         }
 
 
-        public async Task<AdmissionControl.SubmitTransactionResponse>SendTransactionAsync(
-            byte[] privateKey, RawTransaction rawTransaction)
-        {
-            var bytesTrx = rawTransaction.ToByteArray();
-            LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
-            var hash = libraHasher.GetHash(bytesTrx);
+        //public async Task<AdmissionControl.SubmitTransactionResponse>
+        //    SendTransactionAsync(
+        //    byte[] privateKey, RawTransaction rawTransaction)
+        //{
+        //    var bytesTrx = rawTransaction.ToByteArray();
+        //    LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
+        //    var hash = libraHasher.GetHash(bytesTrx);
 
-            var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey, KeyBlobFormat.RawPrivateKey);
+        //    var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey, 
+        //        KeyBlobFormat.RawPrivateKey);
 
-            AdmissionControl.SubmitTransactionRequest req = 
-                new AdmissionControl.SubmitTransactionRequest();
+        //    AdmissionControl.SubmitTransactionRequest req = 
+        //        new AdmissionControl.SubmitTransactionRequest();
 
-            req.SignedTxn = new SignedTransaction();
-            req.SignedTxn.RawTxnBytes = ByteString.CopyFrom(bytesTrx);
-            req.SignedTxn.SenderPublicKey = 
-                ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
-            var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
-            req.SignedTxn.SenderSignature = ByteString.CopyFrom(sig);
+        //    req.SignedTxn = new SignedTransaction();
+        //    req.SignedTxn.RawTxnBytes = ByteString.CopyFrom(bytesTrx);
+        //    req.SignedTxn.SenderPublicKey = 
+        //        ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
+        //    var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
+        //    req.SignedTxn.SenderSignature = ByteString.CopyFrom(sig);
 
-            var result = await _client.SubmitTransactionAsync(
-                 req, new Metadata());
+        //    var result = await _client.SubmitTransactionAsync(
+        //         req, new Metadata());
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public void Shutdown()
         {

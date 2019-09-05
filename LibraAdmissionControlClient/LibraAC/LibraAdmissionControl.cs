@@ -96,10 +96,10 @@ namespace LibraAdmissionControlClient
                 return ret;
 
             var customRawTransaction = new CustomRawTransaction(
-                transaction.RawTxnBytes.ToByteArray());
+                transaction.SignedTxn.ToByteArray());
             ret.RawTransaction = customRawTransaction;
-            ret.SenderPublicKey = transaction.SenderPublicKey.ToByteArray().ByteArryToString();
-            ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
+           // ret.SenderPublicKey = transaction.SenderPublicKey.ToByteArray().ByteArryToString();
+           // ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
             if (info != null)
                 ret.GasUsed = info.GasUsed;
             else
@@ -134,52 +134,52 @@ namespace LibraAdmissionControlClient
 
             var trx = transaction.SignedTransaction;
             var customRawTransaction = new CustomRawTransaction(
-                trx.RawTxnBytes.ToByteArray());
+                trx.SignedTxn.ToByteArray());
             return customRawTransaction;
         }
 
-        public async Task<string> SendTransaction(
-          byte[] privateKey, RawTransaction rawTransaction)
-        {
+        //public async Task<string> SendTransaction(
+        //  byte[] privateKey, byte[] rawTransaction)
+        //{
 
-            var result = await _service.SendTransactionAsync(privateKey, rawTransaction);
-            return result.ToString();
+        //    var result = await _service.SendTransactionAsync(privateKey, rawTransaction);
+        //    return result.ToString();
 
-        }
+        //}
 
-        public async Task<string> SendTransactionPtoP(
-          byte[] senderPrivateKey, string sender, string reciver, ulong amount)
-        {
-            var senderAccount = await GetAccountInfoAsync(sender);
+        //public async Task<string> SendTransactionPtoP(
+        //  byte[] senderPrivateKey, string sender, string reciver, ulong amount)
+        //{
+        //    var senderAccount = await GetAccountInfoAsync(sender);
 
-            RawTransaction rawTr = new RawTransaction()
-            {
-                ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60).ToUnixTimeSeconds(),
-                GasUnitPrice = 0,
-                MaxGasAmount = 29925,
-                SequenceNumber = senderAccount.SequenceNumber
-            };
+        //    RawTransaction rawTr = new RawTransaction()
+        //    {
+        //        ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60).ToUnixTimeSeconds(),
+        //        GasUnitPrice = 0,
+        //        MaxGasAmount = 29925,
+        //        SequenceNumber = senderAccount.SequenceNumber
+        //    };
 
-            rawTr.Program = new Program();
-            rawTr.Program.Code = ByteString.CopyFrom(Utility.PtPTrxBytecode);
+        //    rawTr.Program = new Program();
+        //    rawTr.Program.Code = ByteString.CopyFrom(Utility.PtPTrxBytecode);
 
-            rawTr.Program.Arguments.Add(new TransactionArgument()
-            {
-                Type = TransactionArgument.Types.ArgType.Address,
-                Data = ByteString.CopyFrom(reciver.HexStringToByteArray())
-            });
+        //    rawTr.Program.Arguments.Add(new TransactionArgument()
+        //    {
+        //        Type = TransactionArgument.Types.ArgType.Address,
+        //        Data = ByteString.CopyFrom(reciver.HexStringToByteArray())
+        //    });
 
-            rawTr.Program.Arguments.Add(new TransactionArgument()
-            {
-                Type = TransactionArgument.Types.ArgType.U64,
-                Data = ByteString.CopyFrom(BitConverter.GetBytes(amount))
-            });
+        //    rawTr.Program.Arguments.Add(new TransactionArgument()
+        //    {
+        //        Type = TransactionArgument.Types.ArgType.U64,
+        //        Data = ByteString.CopyFrom(BitConverter.GetBytes(amount))
+        //    });
 
-            rawTr.SenderAccount = ByteString.CopyFrom(sender.HexStringToByteArray());
+        //    rawTr.SenderAccount = ByteString.CopyFrom(sender.HexStringToByteArray());
 
-            var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
-            return result.ToString();
-        }
+        //    var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
+        //    return result.ToString();
+        //}
 
         public void Dispose()
         {

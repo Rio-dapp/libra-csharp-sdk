@@ -1,6 +1,9 @@
-﻿using System;
+﻿using LibraAdmissionControlClient.Enum;
+using System;
 using System.Collections.Generic;
-using System.Text;
+using LibraAdmissionControlClient.LCS;
+using LibraAdmissionControlClient.LCS.LCSTypes;
+using System.Linq;
 using Types;
 
 namespace LibraAdmissionControlClient.Dtos
@@ -11,7 +14,7 @@ namespace LibraAdmissionControlClient.Dtos
         public DateTime ExpirationTime { get; set; }
         public ulong GasUnitPrice { get; set; }
         public ulong MaxGasAmount { get; set; }
-        public short PayloadCase { get; set; }
+        public ETransactionPayloadLCS PayloadCase { get; set; }
         public string Sender { get; set; }
         public string Receiver { get; set; }
         public ulong Amount { get; set; }
@@ -31,41 +34,61 @@ namespace LibraAdmissionControlClient.Dtos
         private void DeserializeRawTransaction(byte[] rawTxnBytes)
         {
             _rawTxnBytes = rawTxnBytes;
-            RawTransaction rawTr = RawTransaction.Parser.ParseFrom(_rawTxnBytes);
-            
+            int cursor = 0;
+            RawTransactionLCS rawTr = _rawTxnBytes.LCSerialization<RawTransactionLCS>(ref cursor);
+
             ExpirationTimeUnix = rawTr.ExpirationTime;
             ExpirationTime = rawTr.ExpirationTime.UnixTimeStampToDateTime();
 
             GasUnitPrice = rawTr.GasUnitPrice;
             MaxGasAmount = rawTr.MaxGasAmount;
-            PayloadCase = (short)rawTr.PayloadCase;
+            PayloadCase = rawTr.TransactionPayload.PayloadTypeEnum;
 
-            Sender = BitConverter.ToString(rawTr.SenderAccount.ToByteArray()).Replace("-", "").ToLower();
-            Receiver = BitConverter.ToString(rawTr.Program.Arguments[0]
-                .Data.ToByteArray()).Replace("-", "").ToLower();
-            Amount = BitConverter.ToUInt64(rawTr.Program.Arguments[1].Data.ToByteArray());
+            Sender = rawTr.Sender.Value;
+
+            var programCode = rawTr.TransactionPayload.PayloadTypeEnum;
+            //if (Utility.IsPtPOrMint(programCode))
+            //    if (rawTr.TransactionPayload.PayloadTypeEnum == ETransactionPayloadLCS.Program)
+            //{
+                var args = rawTr.TransactionPayload.Program.TransactionArguments.ToArray();
+            if (args[0].ArgTypeEnum == ETransactionArgumentLCS.Address &&
+                args[0].ArgTypeEnum == ETransactionArgumentLCS.U64)
+            {
+                Receiver = args[0].Address.Value;
+                Amount = args[1].U64;
+            }
+            //}
             SequenceNumber = rawTr.SequenceNumber;
 
-            List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
-            foreach (var item in rawTr.Program.Arguments)
+            if (rawTr.TransactionPayload.PayloadTypeEnum == ETransactionPayloadLCS.Program)
             {
-                var transactionArgument = new CustomTransactionArgument();
-                transactionArgument.Data = item.Data.ToByteArray();
-                transactionArgument.Type = (short)item.Type;
-                arguments.Add(transactionArgument);
+                List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
+                foreach (var item in rawTr.TransactionPayload.Program.TransactionArguments)
+                {
+                    var transactionArgument = new CustomTransactionArgument();
+
+                    //if (true)
+                    //{
+                    //    transactionArgument.Data = item.Address.Value;
+                    //    transactionArgument.Type = (short)item.Type;
+                    //}
+                    
+
+                    arguments.Add(transactionArgument);
+                }
+
+                List<byte[]> modules = new List<byte[]>();
+
+                foreach (var item in rawTr.TransactionPayload.Program.Modules)
+                    modules.Add(item);
+
+                Program = new CustomProgram()
+                {
+                    Arguments = arguments,
+                    Code = rawTr.TransactionPayload.Program.CodeString,
+                    Modules = modules
+                };
             }
-
-            List<byte[]> modules = new List<byte[]>();
-
-            foreach (var item in rawTr.Program.Modules)
-                modules.Add(item.ToByteArray());
-
-            Program = new CustomProgram()
-            {
-                Arguments = arguments,
-                Code = rawTr.Program.Code.ToByteArray(),
-                Modules = modules
-            };
         }
 
         public override string ToString()
@@ -78,6 +101,6 @@ namespace LibraAdmissionControlClient.Dtos
                     "   SequenceNumber : " + SequenceNumber + "\n}";
         }
 
-        
+
     }
 }
