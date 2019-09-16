@@ -39,33 +39,64 @@ namespace LibraAdmissionControlClient.Dtos
             GasUnitPrice = rawTr.GasUnitPrice;
             MaxGasAmount = rawTr.MaxGasAmount;
             PayloadCase = (short)rawTr.PayloadCase;
-
             Sender = BitConverter.ToString(rawTr.SenderAccount.ToByteArray()).Replace("-", "").ToLower();
-            Receiver = BitConverter.ToString(rawTr.Program.Arguments[0]
-                .Data.ToByteArray()).Replace("-", "").ToLower();
-            Amount = BitConverter.ToUInt64(rawTr.Program.Arguments[1].Data.ToByteArray());
             SequenceNumber = rawTr.SequenceNumber;
 
-            List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
-            foreach (var item in rawTr.Program.Arguments)
+            if (rawTr.Program != null)
             {
-                var transactionArgument = new CustomTransactionArgument();
-                transactionArgument.Data = item.Data.ToByteArray();
-                transactionArgument.Type = (short)item.Type;
-                arguments.Add(transactionArgument);
+                Receiver = BitConverter.ToString(rawTr.Program.Arguments[0]
+                    .Data.ToByteArray()).Replace("-", "").ToLower();
+                Amount = BitConverter.ToUInt64(rawTr.Program
+                    .Arguments[1].Data.ToByteArray());
+                SequenceNumber = rawTr.SequenceNumber;
+
+                List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
+                foreach (var item in rawTr.Program.Arguments)
+                {
+                    var transactionArgument = new CustomTransactionArgument();
+                    transactionArgument.Data = item.Data.ToByteArray();
+                    transactionArgument.Type = (short)item.Type;
+                    arguments.Add(transactionArgument);
+                }
+
+                List<byte[]> modules = new List<byte[]>();
+
+                foreach (var item in rawTr.Program.Modules)
+                    modules.Add(item.ToByteArray());
+
+                Program = new CustomProgram()
+                {
+                    Arguments = arguments,
+                    Code = rawTr.Program.Code.ToByteArray(),
+                    Modules = modules
+                };
             }
-
-            List<byte[]> modules = new List<byte[]>();
-
-            foreach (var item in rawTr.Program.Modules)
-                modules.Add(item.ToByteArray());
-
-            Program = new CustomProgram()
+            else if (rawTr.Script != null)
             {
-                Arguments = arguments,
-                Code = rawTr.Program.Code.ToByteArray(),
-                Modules = modules
-            };
+
+                Receiver = BitConverter.ToString(rawTr.Script.Arguments[0]
+                  .Data.ToByteArray()).Replace("-", "").ToLower();
+                Amount = BitConverter.ToUInt64(rawTr.Script.Arguments[1].Data.ToByteArray());
+                SequenceNumber = rawTr.SequenceNumber;
+
+                List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
+                foreach (var item in rawTr.Script.Arguments)
+                {
+                    var transactionArgument = new CustomTransactionArgument();
+                    transactionArgument.Data = item.Data.ToByteArray();
+                    transactionArgument.Type = (short)item.Type;
+                    arguments.Add(transactionArgument);
+                }
+
+                List<byte[]> modules = new List<byte[]>();
+
+                Program = new CustomProgram()
+                {
+                    Arguments = arguments,
+                    Code = rawTr.Script.Code.ToByteArray(),
+                    Modules = modules
+                };
+            }
         }
 
         public override string ToString()

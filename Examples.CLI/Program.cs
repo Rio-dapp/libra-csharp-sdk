@@ -24,8 +24,8 @@ namespace Examples.CLI
             ///---------------------
             /// GetTransactions
             ///---------------------
-            var start = 1000u;
-            var limit = 20u;
+            var start = 10068u;
+            var limit = 10u;
             var transactions = service.GetTransactionsAsync(start, limit).Result;
             Console.WriteLine(transactions.Count());
 
