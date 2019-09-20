@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text;
+using LibraAdmissionControlClient.LCS;
+using LibraAdmissionControlClient.LCS.LCSTypes;
 
 namespace LibraAdmissionControlClient.Dtos
 {
@@ -38,6 +39,7 @@ namespace LibraAdmissionControlClient.Dtos
         public void DeserializeBlob(byte[] bytes)
         {
             _rawBytes = bytes;
+
 
             int startIndex = GetAssetTypeStartIndex();
 

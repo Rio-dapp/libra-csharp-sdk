@@ -1,6 +1,9 @@
-﻿using System;
+﻿using LibraAdmissionControlClient.Enum;
+using System;
 using System.Collections.Generic;
-using System.Text;
+using LibraAdmissionControlClient.LCS;
+using LibraAdmissionControlClient.LCS.LCSTypes;
+using System.Linq;
 using Types;
 
 namespace LibraAdmissionControlClient.Dtos
@@ -11,13 +14,14 @@ namespace LibraAdmissionControlClient.Dtos
         public DateTime ExpirationTime { get; set; }
         public ulong GasUnitPrice { get; set; }
         public ulong MaxGasAmount { get; set; }
-        public short PayloadCase { get; set; }
+        public ETransactionPayloadLCS PayloadCase { get; set; }
         public string Sender { get; set; }
         public string Receiver { get; set; }
         public ulong Amount { get; set; }
         public ulong SequenceNumber { get; set; }
         public CustomProgram Program { get; set; }
 
+        public byte[] RawTxnBytes { get { return _rawTxnBytes; } }
         byte[] _rawTxnBytes;
         public CustomRawTransaction()
         {
@@ -31,72 +35,121 @@ namespace LibraAdmissionControlClient.Dtos
         private void DeserializeRawTransaction(byte[] rawTxnBytes)
         {
             _rawTxnBytes = rawTxnBytes;
-            RawTransaction rawTr = RawTransaction.Parser.ParseFrom(_rawTxnBytes);
-            
+            int cursor = 0;
+            RawTransactionLCS rawTr = _rawTxnBytes.LCSerialization<RawTransactionLCS>(ref cursor);
+
             ExpirationTimeUnix = rawTr.ExpirationTime;
             ExpirationTime = rawTr.ExpirationTime.UnixTimeStampToDateTime();
 
             GasUnitPrice = rawTr.GasUnitPrice;
             MaxGasAmount = rawTr.MaxGasAmount;
-            PayloadCase = (short)rawTr.PayloadCase;
-            Sender = BitConverter.ToString(rawTr.SenderAccount.ToByteArray()).Replace("-", "").ToLower();
+            PayloadCase = rawTr.TransactionPayload.PayloadTypeEnum;
+
+            Sender = rawTr.Sender.Value;
+
+            var programCode = rawTr.TransactionPayload.PayloadTypeEnum;
+            //if (Utility.IsPtPOrMint(programCode))
+            if (rawTr.TransactionPayload.PayloadTypeEnum ==
+                ETransactionPayloadLCS.Program)
+            {
+                var args = rawTr.TransactionPayload.Program.TransactionArguments.ToArray();
+                if (args.Count() == 2 &&
+                    args[0].ArgTypeEnum == ETransactionArgumentLCS.Address &&
+                    args[1].ArgTypeEnum == ETransactionArgumentLCS.U64)
+                {
+                    Receiver = args[0].Address.Value;
+                    Amount = args[1].U64;
+                }
+            }
+
             SequenceNumber = rawTr.SequenceNumber;
 
-            if (rawTr.Program != null)
+            if (rawTr.TransactionPayload.PayloadTypeEnum ==
+               ETransactionPayloadLCS.Script &&
+               Utility.IsPtPOrMint(rawTr.TransactionPayload.Script.Code))
             {
-                Receiver = BitConverter.ToString(rawTr.Program.Arguments[0]
-                    .Data.ToByteArray()).Replace("-", "").ToLower();
-                Amount = BitConverter.ToUInt64(rawTr.Program
-                    .Arguments[1].Data.ToByteArray());
-                SequenceNumber = rawTr.SequenceNumber;
-
-                List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
-                foreach (var item in rawTr.Program.Arguments)
+                var args = rawTr.TransactionPayload.Script
+                    .TransactionArguments.ToArray();
+                if (args.Count() == 2 &&
+                    args[0].ArgTypeEnum == ETransactionArgumentLCS.Address &&
+                    args[1].ArgTypeEnum == ETransactionArgumentLCS.U64)
                 {
-                    var transactionArgument = new CustomTransactionArgument();
-                    transactionArgument.Data = item.Data.ToByteArray();
-                    transactionArgument.Type = (short)item.Type;
-                    arguments.Add(transactionArgument);
+                    Receiver = args[0].Address.Value;
+                    Amount = args[1].U64;
+                }
+            }
+
+            if (rawTr.TransactionPayload.PayloadTypeEnum ==
+                ETransactionPayloadLCS.Program)
+            {
+                List<CustomTransactionArgument> arguments =
+                    new List<CustomTransactionArgument>();
+                foreach (var item in rawTr.TransactionPayload.Program
+                    .TransactionArguments)
+                {
+                    GerArg(arguments, item);
                 }
 
                 List<byte[]> modules = new List<byte[]>();
 
-                foreach (var item in rawTr.Program.Modules)
-                    modules.Add(item.ToByteArray());
+                foreach (var item in rawTr.TransactionPayload.Program.Modules)
+                    modules.Add(item);
 
                 Program = new CustomProgram()
                 {
+                    PayloadType = (ETransactionPayload)rawTr.TransactionPayload
+                    .PayloadTypeEnum,
                     Arguments = arguments,
-                    Code = rawTr.Program.Code.ToByteArray(),
+                    Code = rawTr.TransactionPayload.Program.Code,
                     Modules = modules
                 };
             }
-            else if (rawTr.Script != null)
+            else if (rawTr.TransactionPayload.PayloadTypeEnum ==
+                ETransactionPayloadLCS.Script)
             {
-
-                Receiver = BitConverter.ToString(rawTr.Script.Arguments[0]
-                  .Data.ToByteArray()).Replace("-", "").ToLower();
-                Amount = BitConverter.ToUInt64(rawTr.Script.Arguments[1].Data.ToByteArray());
-                SequenceNumber = rawTr.SequenceNumber;
-
-                List<CustomTransactionArgument> arguments = new List<CustomTransactionArgument>();
-                foreach (var item in rawTr.Script.Arguments)
+                List<CustomTransactionArgument> arguments =
+                    new List<CustomTransactionArgument>();
+                foreach (var item in rawTr.TransactionPayload.Script
+                    .TransactionArguments)
                 {
-                    var transactionArgument = new CustomTransactionArgument();
-                    transactionArgument.Data = item.Data.ToByteArray();
-                    transactionArgument.Type = (short)item.Type;
-                    arguments.Add(transactionArgument);
+                    GerArg(arguments, item);
                 }
 
+                Program = new CustomProgram()
+                {
+                    PayloadType = (ETransactionPayload)rawTr.TransactionPayload
+                    .PayloadTypeEnum,
+                    Arguments = arguments,
+                    Code = rawTr.TransactionPayload.Script.Code
+                };
+            }
+            else if (rawTr.TransactionPayload.PayloadTypeEnum ==
+                ETransactionPayloadLCS.Module)
+            {
                 List<byte[]> modules = new List<byte[]>();
+                modules.Add(rawTr.TransactionPayload.Module.Code);
 
                 Program = new CustomProgram()
                 {
-                    Arguments = arguments,
-                    Code = rawTr.Script.Code.ToByteArray(),
+                    PayloadType = (ETransactionPayload)rawTr.TransactionPayload
+                    .PayloadTypeEnum,
                     Modules = modules
                 };
             }
+        }
+
+        private static void GerArg(List<CustomTransactionArgument> arguments, TransactionArgumentLCS item)
+        {
+            var transactionArgument = new CustomTransactionArgument();
+
+            transactionArgument.ArgType = (uint)item.ArgTypeEnum;
+
+            transactionArgument.Address = item.Address.Value;
+            transactionArgument.U64 = item.U64;
+            transactionArgument.String = item.String;
+            transactionArgument.ByteArray = item.ByteArray;
+
+            arguments.Add(transactionArgument);
         }
 
         public override string ToString()
@@ -109,6 +162,6 @@ namespace LibraAdmissionControlClient.Dtos
                     "   SequenceNumber : " + SequenceNumber + "\n}";
         }
 
-        
+
     }
 }
