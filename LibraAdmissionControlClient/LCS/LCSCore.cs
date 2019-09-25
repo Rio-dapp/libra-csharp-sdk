@@ -130,9 +130,69 @@ namespace LibraAdmissionControlClient.LCS
         /// Libra Canonical Deserialization
         /// </summary>
         /// <returns></returns>
-        public static byte[] LCDeserialization(ulong source)
+        public static byte[] LCDeserialization(object source)
         {
-            return _deserialization.U64ToByte(source);
+            var type = source.GetType();
+            if (type == typeof(AddressLCS))
+            {
+                return _deserialization.AddressToByte((AddressLCS)source);
+            }
+            else if (type == typeof(ulong))
+            {
+                return _deserialization.U64ToByte((ulong)source);
+            }
+            else if (type == typeof(uint))
+            {
+                return _deserialization.U32ToByte((uint)source);
+            }
+            else if (type == typeof(string))
+            {
+                return _deserialization.StringToByte((string)source);
+            }
+            else if (type == typeof(byte[]))
+            {
+                return _deserialization.ByteArrToByte((byte[])source);
+            }
+            else if (type == typeof(List<byte[]>))
+            {
+                return _deserialization.ListByteArrToByte((List<byte[]>)source);
+            }
+            else if (type == typeof(bool))
+            {
+                return _deserialization.BoolToByte((bool)source);
+            }
+            else if (type == typeof(TransactionPayloadLCS))
+            {
+                return _deserialization.TransactionPayloadToByte(
+                    (TransactionPayloadLCS)source);
+            }
+            else if (type == typeof(ProgramLCS))
+            {
+                return _deserialization.ProgramToByte(
+                    (ProgramLCS)source);
+            }
+            else if (type == typeof(ScriptLCS))
+            {
+                return _deserialization.ScriptToByte(
+                   (ScriptLCS)source);
+            }
+            else if (type == typeof(ModuleLCS))
+            {
+                return _deserialization.ModuleToByte(
+                    (ModuleLCS)source);
+            }
+            else if (type == typeof(TransactionArgumentLCS))
+            {
+                return _deserialization.TransactionArgumentToByte(
+                    (TransactionArgumentLCS)source);
+            }
+            else if (type == typeof(List<TransactionArgumentLCS>))
+            {
+                return _deserialization.ListTransactionArgumentToByte(
+                   (List<TransactionArgumentLCS>)source);
+            }
+
+            return null;
         }
 
         //public static byte[] LCDeserialization(AddressLCS source)

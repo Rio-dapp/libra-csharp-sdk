@@ -5,6 +5,8 @@ using Types;
 using Grpc.Core;
 using static AdmissionControl.AdmissionControl;
 using LibraAdmissionControlClient.Dtos;
+using LibraAdmissionControlClient.LCS.LCSTypes;
+using LibraAdmissionControlClient.LCS;
 
 namespace Examples.CLI
 {
@@ -36,6 +38,17 @@ namespace Examples.CLI
             var trx = service.GetTransactionsBySequenceNumberAsync(address, 0).Result;
             Console.WriteLine("Receiver = {0}, Amount = {1}", trx.Receiver, trx.Amount);
 
+            #region LCS test
+            AddressLCS addressLcs = new AddressLCS() {
+                 Length = (uint)32,
+                 Value = address
+            };
+            byte[] addressByteLcs = LCSCore.LCDeserialization(addressLcs);
+            addressLcs = LCSCore.LCSerialization<AddressLCS>(
+                addressByteLcs);
+            Console.WriteLine("LCS - "  + addressLcs);
+            #endregion
+
             #region TO DO with LCS
             ///---------------------
             /// SendTransaction PtP
@@ -60,7 +73,7 @@ namespace Examples.CLI
             {
                 //Check account balance from the beginning
                 Console.WriteLine(ex.Message);
-            } 
+            }
             #endregion
             Console.ReadKey();
         }

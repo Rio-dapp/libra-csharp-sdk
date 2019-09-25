@@ -8,7 +8,7 @@ namespace LibraAdmissionControlClient.LCS.LCSTypes
     {
         public byte[] ValueByte { get; set; }
         public string Value { get; set; }
-        public uint Length { get; internal set; }
+        public uint Length { get; set; }
 
         public override string ToString()
         {
