@@ -12,13 +12,13 @@ namespace LibraAdmissionControlClient.LCS
         static LibraCanonicalSerialization _serialization =
             new LibraCanonicalSerialization();
 
-        public static T LCSerialization<T>(this byte[] source)
+        public static T LCSerialize<T>(this byte[] source)
         {
             int cursor = 0;
-            return source.LCSerialization<T>(ref cursor);
+            return source.LCSerialize<T>(ref cursor);
         }
 
-        public static T LCSerialization<T>(this byte[] source, ref int cursor)
+        public static T LCSerialize<T>(this byte[] source, ref int cursor)
         {
             var type = typeof(T);
             if (type == typeof(AddressLCS))
@@ -121,7 +121,6 @@ namespace LibraAdmissionControlClient.LCS
                 return (T)Convert.ChangeType(
                   _serialization.GetRawTransaction(source, ref cursor), typeof(T));
             }
-
             throw new Exception("Unsupported type.");
         }
 
@@ -130,7 +129,7 @@ namespace LibraAdmissionControlClient.LCS
         /// Libra Canonical Deserialization
         /// </summary>
         /// <returns></returns>
-        public static byte[] LCDeserialization(object source)
+        public static byte[] LCDeserialize(object source)
         {
             var type = source.GetType();
             if (type == typeof(AddressLCS))
@@ -191,8 +190,13 @@ namespace LibraAdmissionControlClient.LCS
                 return _deserialization.ListTransactionArgumentToByte(
                    (List<TransactionArgumentLCS>)source);
             }
+            else if (type == typeof(RawTransactionLCS))
+            {
+                return _deserialization.RawTransactionToByte(
+                   (RawTransactionLCS)source);
+            }
 
-            return null;
+            throw new Exception("Unsupported type.");
         }
 
         //public static byte[] LCDeserialization(AddressLCS source)

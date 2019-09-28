@@ -14,11 +14,11 @@ namespace LibraAdmissionControlClient.LCS
         {
             var retVal = new AccountResourceLCS();
 
-            retVal.AuthenticationKey = source.LCSerialization<AddressLCS>(ref cursor);
+            retVal.AuthenticationKey = source.LCSerialize<AddressLCS>(ref cursor);
             retVal.Balance = Read_u64(source, ref cursor);
-            retVal.DelegatedWithdrawalCapability = source.LCSerialization<bool>(ref cursor);
-            retVal.ReceivedEvents = source.LCSerialization<byte[]>(ref cursor);
-            retVal.SentEvents = source.LCSerialization<byte[]>(ref cursor);
+            retVal.DelegatedWithdrawalCapability = source.LCSerialize<bool>(ref cursor);
+            retVal.ReceivedEvents = source.LCSerialize<byte[]>(ref cursor);
+            retVal.SentEvents = source.LCSerialize<byte[]>(ref cursor);
             retVal.SequenceNumber = Read_u64(source, ref cursor);
 
             return retVal;
@@ -28,10 +28,10 @@ namespace LibraAdmissionControlClient.LCS
         {
             var retVal = new RawTransactionLCS();
 
-            retVal.Sender = source.LCSerialization<AddressLCS>(ref cursor);
-            retVal.SequenceNumber = source.LCSerialization<ulong>(ref cursor);
+            retVal.Sender = source.LCSerialize<AddressLCS>(ref cursor);
+            retVal.SequenceNumber = source.LCSerialize<ulong>(ref cursor);
             retVal.TransactionPayload =
-                source.LCSerialization<TransactionPayloadLCS>(ref cursor);
+                source.LCSerialize<TransactionPayloadLCS>(ref cursor);
             retVal.MaxGasAmount = Read_u64(source, ref cursor);
             retVal.GasUnitPrice = Read_u64(source, ref cursor);
             retVal.ExpirationTime = Read_u64(source, ref cursor);
@@ -42,10 +42,10 @@ namespace LibraAdmissionControlClient.LCS
         public WriteOpLCS GetWriteOp(byte[] source, ref int cursor)
         {
             var retVal = new WriteOpLCS();
-            retVal.WriteOpType = source.LCSerialization<uint>(ref cursor);
+            retVal.WriteOpType = source.LCSerialize<uint>(ref cursor);
 
             if (retVal.WriteOpTypeEnum == Enum.EWriteOpLCS.Value)
-                retVal.Value = source.LCSerialization<byte[]>(ref cursor);
+                retVal.Value = source.LCSerialize<byte[]>(ref cursor);
 
             return retVal;
         }
@@ -54,8 +54,8 @@ namespace LibraAdmissionControlClient.LCS
         {
             var retVal = new AccessPathLCS();
 
-            retVal.Address = source.LCSerialization<AddressLCS>(ref cursor);
-            retVal.Path = source.LCSerialization<byte[]>(ref cursor);
+            retVal.Address = source.LCSerialize<AddressLCS>(ref cursor);
+            retVal.Path = source.LCSerialize<byte[]>(ref cursor);
 
             return retVal;
         }
@@ -64,8 +64,8 @@ namespace LibraAdmissionControlClient.LCS
         {
             var retVal = new AccountEventLCS();
 
-            retVal.Amount = source.LCSerialization<ulong>(ref cursor);
-            retVal.Account = source.LCSerialization<byte[]>(ref cursor)
+            retVal.Amount = source.LCSerialize<ulong>(ref cursor);
+            retVal.Account = source.LCSerialize<byte[]>(ref cursor)
                 .ByteArryToString();
 
             return retVal;
@@ -79,8 +79,8 @@ namespace LibraAdmissionControlClient.LCS
 
             for (int i = 0; i < retVal.Length; i++)
             {
-                var key = source.LCSerialization<AccessPathLCS>(ref cursor);
-                var value = source.LCSerialization<WriteOpLCS>(ref cursor);
+                var key = source.LCSerialize<AccessPathLCS>(ref cursor);
+                var value = source.LCSerialize<WriteOpLCS>(ref cursor);
 
                 retVal.WriteSet.Add(key, value);
             }
@@ -104,7 +104,7 @@ namespace LibraAdmissionControlClient.LCS
             var length = Read_u32(source, ref cursor);
 
             for (int i = 0; i < length; i++)
-                retVal.Add(source.LCSerialization<byte[]>(ref cursor));
+                retVal.Add(source.LCSerialize<byte[]>(ref cursor));
 
             return retVal;
         }
@@ -153,13 +153,13 @@ namespace LibraAdmissionControlClient.LCS
             retVal.PayloadType = Read_u32(source, ref cursor);
 
             if (retVal.PayloadTypeEnum == Enum.ETransactionPayloadLCS.Program)
-                retVal.Program = source.LCSerialization<ProgramLCS>(ref cursor);
+                retVal.Program = source.LCSerialize<ProgramLCS>(ref cursor);
             else if (retVal.PayloadTypeEnum == Enum.ETransactionPayloadLCS.WriteSet)
-                retVal.WriteSet = source.LCSerialization<WriteSetLCS>(ref cursor);
+                retVal.WriteSet = source.LCSerialize<WriteSetLCS>(ref cursor);
             else if (retVal.PayloadTypeEnum == Enum.ETransactionPayloadLCS.Script)
-                retVal.Script = source.LCSerialization<ScriptLCS>(ref cursor);
+                retVal.Script = source.LCSerialize<ScriptLCS>(ref cursor);
             else if (retVal.PayloadTypeEnum == Enum.ETransactionPayloadLCS.Module)
-                retVal.Module = source.LCSerialization<ModuleLCS>(ref cursor);
+                retVal.Module = source.LCSerialize<ModuleLCS>(ref cursor);
 
             return retVal;
         }
@@ -173,26 +173,26 @@ namespace LibraAdmissionControlClient.LCS
             //  args: Vec<TransactionArgument>, // Variable length array of TransactionArguments
             //  modules: Vec<Vec<u8>>, // Variable length array of variable length byte arrays
             // }
-            retVal.Code = source.LCSerialization<byte[]>(ref cursor);
+            retVal.Code = source.LCSerialize<byte[]>(ref cursor);
             retVal.TransactionArguments =
-                source.LCSerialization<List<TransactionArgumentLCS>>(ref cursor);
-            retVal.Modules = source.LCSerialization<List<byte[]>>(ref cursor);
+                source.LCSerialize<List<TransactionArgumentLCS>>(ref cursor);
+            retVal.Modules = source.LCSerialize<List<byte[]>>(ref cursor);
 
             return retVal;
         }
         public ScriptLCS GetScript(byte[] source, ref int cursor)
         {
             var retVal = new ScriptLCS();
-            retVal.Code = source.LCSerialization<byte[]>(ref cursor);
+            retVal.Code = source.LCSerialize<byte[]>(ref cursor);
             retVal.TransactionArguments =
-                source.LCSerialization<List<TransactionArgumentLCS>>(ref cursor);
+                source.LCSerialize<List<TransactionArgumentLCS>>(ref cursor);
 
             return retVal;
         }
         public ModuleLCS GetModule(byte[] source, ref int cursor)
         {
             var retVal = new ModuleLCS();
-            retVal.Code = source.LCSerialization<byte[]>(ref cursor);
+            retVal.Code = source.LCSerialize<byte[]>(ref cursor);
             return retVal;
         }
 
@@ -208,15 +208,15 @@ namespace LibraAdmissionControlClient.LCS
             }
             else if (retVal.ArgTypeEnum == Enum.ETransactionArgumentLCS.Address)
             {
-                retVal.Address = source.LCSerialization<AddressLCS>(ref cursor);
+                retVal.Address = source.LCSerialize<AddressLCS>(ref cursor);
             }
             else if (retVal.ArgTypeEnum == Enum.ETransactionArgumentLCS.ByteArray)
             {
-                retVal.ByteArray = source.LCSerialization<byte[]>(ref cursor);
+                retVal.ByteArray = source.LCSerialize<byte[]>(ref cursor);
             }
             else if (retVal.ArgTypeEnum == Enum.ETransactionArgumentLCS.String)
             {
-                retVal.String = source.LCSerialization<string>(ref cursor);
+                retVal.String = source.LCSerialize<string>(ref cursor);
             }
 
             return retVal;
@@ -229,7 +229,7 @@ namespace LibraAdmissionControlClient.LCS
             var length = Read_u32(source, ref cursor);
 
             for (int i = 0; i < length; i++)
-                retVal.Add(source.LCSerialization<TransactionArgumentLCS>(ref cursor));
+                retVal.Add(source.LCSerialize<TransactionArgumentLCS>(ref cursor));
 
             return retVal;
         }

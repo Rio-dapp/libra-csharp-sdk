@@ -13,6 +13,8 @@ using System.Security.Cryptography;
 using NSec.Cryptography;
 using Waher.Security.SHA3;
 using LibraAdmissionControlClient.Utilityes;
+using LibraAdmissionControlClient.LCS.LCSTypes;
+using LibraAdmissionControlClient.LCS;
 
 namespace LibraAdmissionControlClient
 {
@@ -134,32 +136,37 @@ namespace LibraAdmissionControlClient
         }
 
 
-        //public async Task<AdmissionControl.SubmitTransactionResponse>
-        //    SendTransactionAsync(
-        //    byte[] privateKey, RawTransaction rawTransaction)
-        //{
-        //    var bytesTrx = rawTransaction.ToByteArray();
-        //    LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
-        //    var hash = libraHasher.GetHash(bytesTrx);
+        public async Task<AdmissionControl.SubmitTransactionResponse>
+            SendTransactionAsync(
+            byte[] privateKey, RawTransactionLCS rawTransaction)
+        {
+            var bytesTrx = LCSCore.LCDeserialize(rawTransaction);
+            LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
+            var hash = libraHasher.GetHash(bytesTrx);
 
-        //    var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey, 
-        //        KeyBlobFormat.RawPrivateKey);
+            var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey,
+                KeyBlobFormat.RawPrivateKey);
 
-        //    AdmissionControl.SubmitTransactionRequest req = 
-        //        new AdmissionControl.SubmitTransactionRequest();
+            AdmissionControl.SubmitTransactionRequest req =
+                new AdmissionControl.SubmitTransactionRequest();
+            
+            req.SignedTxn = new SignedTransaction();
+           
+            List<byte> retArr = new List<byte>();
+            retArr = retArr.Concat(bytesTrx).ToList();
+            //req.SignedTxn.SenderPublicKey =
+            //    ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
+            retArr = retArr.Concat(
+                LCSCore.LCDeserialize(key.Export(KeyBlobFormat.RawPublicKey))).ToList();
+            var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
+            retArr = retArr.Concat(LCSCore.LCDeserialize(sig)).ToList();
+            req.SignedTxn.SignedTxn = ByteString.CopyFrom(retArr.ToArray());
 
-        //    req.SignedTxn = new SignedTransaction();
-        //    req.SignedTxn.RawTxnBytes = ByteString.CopyFrom(bytesTrx);
-        //    req.SignedTxn.SenderPublicKey = 
-        //        ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
-        //    var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
-        //    req.SignedTxn.SenderSignature = ByteString.CopyFrom(sig);
+            var result = await _client.SubmitTransactionAsync(
+                 req, new Metadata());
 
-        //    var result = await _client.SubmitTransactionAsync(
-        //         req, new Metadata());
-
-        //    return result;
-        //}
+            return result;
+        }
 
         public void Shutdown()
         {

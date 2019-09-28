@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Types;
 using Google.Protobuf;
+using LibraAdmissionControlClient.LCS.LCSTypes;
+using LibraAdmissionControlClient.Enum;
 
 namespace LibraAdmissionControlClient
 {
@@ -148,39 +150,44 @@ namespace LibraAdmissionControlClient
 
         //}
 
-        //public async Task<string> SendTransactionPtoP(
-        //  byte[] senderPrivateKey, string sender, string reciver, ulong amount)
-        //{
-        //    var senderAccount = await GetAccountInfoAsync(sender);
+        public async Task<string> SendTransactionPtoP(
+          byte[] senderPrivateKey, string sender, string reciver, ulong amount)
+        {
+            var senderAccount = await GetAccountInfoAsync(sender);
 
-        //    RawTransaction rawTr = new RawTransaction()
-        //    {
-        //        ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60).ToUnixTimeSeconds(),
-        //        GasUnitPrice = 0,
-        //        MaxGasAmount = 29925,
-        //        SequenceNumber = senderAccount.SequenceNumber
-        //    };
+            RawTransactionLCS rawTr = new RawTransactionLCS()
+            {
+                ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60)
+                .ToUnixTimeSeconds(),
+                GasUnitPrice = 0,
+                MaxGasAmount = 100000,
+                SequenceNumber = senderAccount.SequenceNumber
+            };
 
-        //    rawTr.Program = new Program();
-        //    rawTr.Program.Code = ByteString.CopyFrom(Utility.PtPTrxBytecode);
+            rawTr.TransactionPayload = new TransactionPayloadLCS();
 
-        //    rawTr.Program.Arguments.Add(new TransactionArgument()
-        //    {
-        //        Type = TransactionArgument.Types.ArgType.Address,
-        //        Data = ByteString.CopyFrom(reciver.HexStringToByteArray())
-        //    });
+            rawTr.TransactionPayload.PayloadType = (uint)ETransactionPayloadLCS.Script;
+            rawTr.TransactionPayload.Script = new ScriptLCS()
+            {
+                Code = Utility.PtPTrxBytecode,
+                TransactionArguments = new List<TransactionArgumentLCS>() {
+                     new TransactionArgumentLCS()
+                     {
+                         ArgType = (uint)ETransactionArgumentLCS.Address,
+                         Address = new AddressLCS(reciver)
+                     },
+                     new TransactionArgumentLCS(){
+                         ArgType = (uint)ETransactionArgumentLCS.U64,
+                         U64 = amount
+                     }
+                }
+            };
+            rawTr.Sender = new AddressLCS(sender);
 
-        //    rawTr.Program.Arguments.Add(new TransactionArgument()
-        //    {
-        //        Type = TransactionArgument.Types.ArgType.U64,
-        //        Data = ByteString.CopyFrom(BitConverter.GetBytes(amount))
-        //    });
+            var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
 
-        //    rawTr.SenderAccount = ByteString.CopyFrom(sender.HexStringToByteArray());
-
-        //    var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
-        //    return result.ToString();
-        //}
+            return result.ToString();
+        }
 
         public void Dispose()
         {
