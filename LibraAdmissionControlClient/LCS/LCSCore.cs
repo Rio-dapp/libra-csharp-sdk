@@ -12,114 +12,114 @@ namespace LibraAdmissionControlClient.LCS
         static LibraCanonicalSerialization _serialization =
             new LibraCanonicalSerialization();
 
-        public static T LCSerialize<T>(this byte[] source)
+        public static T LCDeserialize<T>(this byte[] source)
         {
             int cursor = 0;
-            return source.LCSerialize<T>(ref cursor);
+            return source.LCDeserialize<T>(ref cursor);
         }
 
-        public static T LCSerialize<T>(this byte[] source, ref int cursor)
+        public static T LCDeserialize<T>(this byte[] source, ref int cursor)
         {
             var type = typeof(T);
             if (type == typeof(AddressLCS))
             {
                 return (T)Convert.ChangeType(
-                    _serialization.GetAddress(source, ref cursor), typeof(T));
+                    _deserialization.GetAddress(source, ref cursor), typeof(T));
             }
             else if (type == typeof(ulong))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetU64(source, ref cursor), typeof(T));
+                  _deserialization.GetU64(source, ref cursor), typeof(T));
             }
             else if (type == typeof(uint))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetU32(source, ref cursor), typeof(T));
+                  _deserialization.GetU32(source, ref cursor), typeof(T));
             }
             else if (type == typeof(string))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetString(source, ref cursor), typeof(T));
+                  _deserialization.GetString(source, ref cursor), typeof(T));
             }
             else if (type == typeof(byte))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetByte(source, ref cursor), typeof(T));
+                  _deserialization.GetByte(source, ref cursor), typeof(T));
             }
             else if (type == typeof(byte[]))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetByteArray(source, ref cursor), typeof(T));
+                  _deserialization.GetByteArray(source, ref cursor), typeof(T));
             }
             else if (type == typeof(TransactionPayloadLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetTransactionPayload(source, ref cursor), typeof(T));
+                  _deserialization.GetTransactionPayload(source, ref cursor), typeof(T));
             }
             else if (type == typeof(ProgramLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetProgram(source, ref cursor), typeof(T));
+                  _deserialization.GetProgram(source, ref cursor), typeof(T));
             }
             else if (type == typeof(ScriptLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetScript(source, ref cursor), typeof(T));
+                  _deserialization.GetScript(source, ref cursor), typeof(T));
             }
             else if (type == typeof(ModuleLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetModule(source, ref cursor), typeof(T));
+                  _deserialization.GetModule(source, ref cursor), typeof(T));
             }
             else if (type == typeof(TransactionArgumentLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetTransactionArgument(source, ref cursor), typeof(T));
+                  _deserialization.GetTransactionArgument(source, ref cursor), typeof(T));
             }
             else if (type == typeof(List<TransactionArgumentLCS>))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetTransactionArguments(source, ref cursor), typeof(T));
+                  _deserialization.GetTransactionArguments(source, ref cursor), typeof(T));
             }
             else if (type == typeof(List<byte[]>))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetListByteArrays(source, ref cursor), typeof(T));
+                  _deserialization.GetListByteArrays(source, ref cursor), typeof(T));
             }
             else if (type == typeof(WriteSetLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetWriteSet(source, ref cursor), typeof(T));
+                  _deserialization.GetWriteSet(source, ref cursor), typeof(T));
             }
             else if (type == typeof(WriteOpLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetWriteOp(source, ref cursor), typeof(T));
+                  _deserialization.GetWriteOp(source, ref cursor), typeof(T));
             }
             else if (type == typeof(AccessPathLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetAccessPath(source, ref cursor), typeof(T));
+                  _deserialization.GetAccessPath(source, ref cursor), typeof(T));
             }
             else if (type == typeof(bool))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetBool(source, ref cursor), typeof(T));
+                  _deserialization.GetBool(source, ref cursor), typeof(T));
             }
             else if (type == typeof(AccountEventLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetAccountEvent(source, ref cursor), typeof(T));
+                  _deserialization.GetAccountEvent(source, ref cursor), typeof(T));
             }
             else if (type == typeof(AccountResourceLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetAccountResource(source, ref cursor), typeof(T));
+                  _deserialization.GetAccountResource(source, ref cursor), typeof(T));
             }
             else if (type == typeof(RawTransactionLCS))
             {
                 return (T)Convert.ChangeType(
-                  _serialization.GetRawTransaction(source, ref cursor), typeof(T));
+                  _deserialization.GetRawTransaction(source, ref cursor), typeof(T));
             }
             throw new Exception("Unsupported type.");
         }
@@ -129,81 +129,75 @@ namespace LibraAdmissionControlClient.LCS
         /// Libra Canonical Deserialization
         /// </summary>
         /// <returns></returns>
-        public static byte[] LCDeserialize(object source)
+        public static byte[] LCSerialize(object source)
         {
             var type = source.GetType();
             if (type == typeof(AddressLCS))
             {
-                return _deserialization.AddressToByte((AddressLCS)source);
+                return _serialization.AddressToByte((AddressLCS)source);
             }
             else if (type == typeof(ulong))
             {
-                return _deserialization.U64ToByte((ulong)source);
+                return _serialization.U64ToByte((ulong)source);
             }
             else if (type == typeof(uint))
             {
-                return _deserialization.U32ToByte((uint)source);
+                return _serialization.U32ToByte((uint)source);
             }
             else if (type == typeof(string))
             {
-                return _deserialization.StringToByte((string)source);
+                return _serialization.StringToByte((string)source);
             }
             else if (type == typeof(byte[]))
             {
-                return _deserialization.ByteArrToByte((byte[])source);
+                return _serialization.ByteArrToByte((byte[])source);
             }
             else if (type == typeof(List<byte[]>))
             {
-                return _deserialization.ListByteArrToByte((List<byte[]>)source);
+                return _serialization.ListByteArrToByte((List<byte[]>)source);
             }
             else if (type == typeof(bool))
             {
-                return _deserialization.BoolToByte((bool)source);
+                return _serialization.BoolToByte((bool)source);
             }
             else if (type == typeof(TransactionPayloadLCS))
             {
-                return _deserialization.TransactionPayloadToByte(
+                return _serialization.TransactionPayloadToByte(
                     (TransactionPayloadLCS)source);
             }
             else if (type == typeof(ProgramLCS))
             {
-                return _deserialization.ProgramToByte(
+                return _serialization.ProgramToByte(
                     (ProgramLCS)source);
             }
             else if (type == typeof(ScriptLCS))
             {
-                return _deserialization.ScriptToByte(
+                return _serialization.ScriptToByte(
                    (ScriptLCS)source);
             }
             else if (type == typeof(ModuleLCS))
             {
-                return _deserialization.ModuleToByte(
+                return _serialization.ModuleToByte(
                     (ModuleLCS)source);
             }
             else if (type == typeof(TransactionArgumentLCS))
             {
-                return _deserialization.TransactionArgumentToByte(
+                return _serialization.TransactionArgumentToByte(
                     (TransactionArgumentLCS)source);
             }
             else if (type == typeof(List<TransactionArgumentLCS>))
             {
-                return _deserialization.ListTransactionArgumentToByte(
+                return _serialization.ListTransactionArgumentToByte(
                    (List<TransactionArgumentLCS>)source);
             }
             else if (type == typeof(RawTransactionLCS))
             {
-                return _deserialization.RawTransactionToByte(
+                return _serialization.RawTransactionToByte(
                    (RawTransactionLCS)source);
             }
 
             throw new Exception("Unsupported type.");
         }
-
-        //public static byte[] LCDeserialization(AddressLCS source)
-        //{
-        //    return _deserialization.U64ToByte(source);
-        //}
-
         #endregion
     }
 }

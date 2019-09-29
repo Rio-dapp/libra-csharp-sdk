@@ -9,6 +9,7 @@ using Types;
 using Google.Protobuf;
 using LibraAdmissionControlClient.LCS.LCSTypes;
 using LibraAdmissionControlClient.Enum;
+using LibraAdmissionControlClient.LCS;
 
 namespace LibraAdmissionControlClient
 {
@@ -183,7 +184,6 @@ namespace LibraAdmissionControlClient
                 }
             };
             rawTr.Sender = new AddressLCS(sender);
-
             var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
 
             return result.ToString();

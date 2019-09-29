@@ -140,31 +140,27 @@ namespace LibraAdmissionControlClient
             SendTransactionAsync(
             byte[] privateKey, RawTransactionLCS rawTransaction)
         {
-            var bytesTrx = LCSCore.LCDeserialize(rawTransaction);
+            var bytesTrx = LCSCore.LCSerialize(rawTransaction);
             LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
             var hash = libraHasher.GetHash(bytesTrx);
 
             var key = Key.Import(SignatureAlgorithm.Ed25519, privateKey,
                 KeyBlobFormat.RawPrivateKey);
-
             AdmissionControl.SubmitTransactionRequest req =
                 new AdmissionControl.SubmitTransactionRequest();
             
             req.SignedTxn = new SignedTransaction();
-           
+
             List<byte> retArr = new List<byte>();
             retArr = retArr.Concat(bytesTrx).ToList();
-            //req.SignedTxn.SenderPublicKey =
-            //    ByteString.CopyFrom(key.Export(KeyBlobFormat.RawPublicKey));
             retArr = retArr.Concat(
-                LCSCore.LCDeserialize(key.Export(KeyBlobFormat.RawPublicKey))).ToList();
+                LCSCore.LCSerialize(key.Export(KeyBlobFormat.RawPublicKey))).ToList();
             var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
-            retArr = retArr.Concat(LCSCore.LCDeserialize(sig)).ToList();
+            retArr = retArr.Concat(LCSCore.LCSerialize(sig)).ToList();
             req.SignedTxn.SignedTxn = ByteString.CopyFrom(retArr.ToArray());
 
             var result = await _client.SubmitTransactionAsync(
                  req, new Metadata());
-
             return result;
         }
 

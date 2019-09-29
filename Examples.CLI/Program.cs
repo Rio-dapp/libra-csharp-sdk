@@ -7,6 +7,8 @@ using static AdmissionControl.AdmissionControl;
 using LibraAdmissionControlClient.Dtos;
 using LibraAdmissionControlClient.LCS.LCSTypes;
 using LibraAdmissionControlClient.LCS;
+using NSec.Cryptography;
+using System.Text;
 
 namespace Examples.CLI
 {
@@ -40,28 +42,28 @@ namespace Examples.CLI
 
             #region LCS test
             AddressLCS addressLcs = new AddressLCS(address);
-            byte[] addressByteLcs = LCSCore.LCDeserialize(addressLcs);
-            addressLcs = LCSCore.LCSerialize<AddressLCS>(addressByteLcs);
-            Console.WriteLine("LCS - "  + addressLcs);
+            byte[] addressByteLcs = LCSCore.LCSerialize(addressLcs);
+            addressLcs = LCSCore.LCDeserialize<AddressLCS>(addressByteLcs);
+            Console.WriteLine("LCS - " + addressLcs);
             #endregion
 
-            #region TO DO with LCS
+            #region SendTransaction
             ///---------------------
-            /// SendTransaction PtP
+            /// SendTransaction PtoP
             ///---------------------
             try
             {
                 //Check account balance from the beginning
-                var privateKey = new byte[] { 178, 112, 46, 189, 215, 71, 50, 157, 47, 25, 137, 23, 6, 213, 57, 174, 96, 12, 213, 116, 239, 162, 235, 187, 130, 34, 4, 136, 202, 221, 88, 170 };
-                var publicKey = new byte[] { 37, 180, 53, 15, 179, 240, 136, 66, 29, 12, 170, 235, 203, 145, 158, 215, 28, 62, 134, 82, 213, 95, 78, 173, 39, 136, 29, 212, 132, 214, 199, 168 };
-                string sender = "484fbead75efef9d9624df373106837d8188583a764b52269a3d4a8205eeafa1";
-                var result = service.SendTransactionPtoP(privateKey,
+                var privateKey = new byte[] { 82, 86, 29, 56, 85, 21, 64, 101, 182, 161, 68, 237, 96, 47, 86, 108, 60, 106, 231, 218, 202, 31, 215, 3, 131, 208, 224, 94, 96, 89, 149, 168 };
+                string sender = "36dba2da4eb4ee1f9955800940a029d435a6bc1cd4ad748ec63a9d9e4410c345";
+                var result = service.SendTransactionPtoP(
+                    privateKey,
                     sender,
                     address,
                     100).Result;
                 Console.WriteLine("SendTransaction Result = {0}", result);
                 //{ "acStatus": { } }
-                //-Success
+                // - Success
             }
             catch (Exception ex)
             {
@@ -69,6 +71,9 @@ namespace Examples.CLI
                 Console.WriteLine(ex.Message);
             }
             #endregion
+
+
+
             Console.ReadKey();
         }
     }

@@ -27,6 +27,14 @@ namespace LibraAdmissionControlClient.LCS.LCSTypes
             {
                 retStr += string.Format(" Program = {0},", Program);
             }
+            if (PayloadTypeEnum == ETransactionPayloadLCS.Script)
+            {
+                retStr += string.Format(" Script = {0},", Script);
+            }
+            if (PayloadTypeEnum == ETransactionPayloadLCS.Module)
+            {
+                retStr += string.Format(" Module = {0},", Module);
+            }
             else if (PayloadTypeEnum == ETransactionPayloadLCS.WriteSet)
             {
                 retStr += string.Format(" WriteSet = {0},", WriteSet);

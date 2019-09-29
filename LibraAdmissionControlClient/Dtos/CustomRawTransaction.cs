@@ -36,7 +36,7 @@ namespace LibraAdmissionControlClient.Dtos
         {
             _rawTxnBytes = rawTxnBytes;
             int cursor = 0;
-            RawTransactionLCS rawTr = _rawTxnBytes.LCSerialize<RawTransactionLCS>(ref cursor);
+            RawTransactionLCS rawTr = _rawTxnBytes.LCDeserialize<RawTransactionLCS>(ref cursor);
 
             ExpirationTimeUnix = rawTr.ExpirationTime;
             ExpirationTime = rawTr.ExpirationTime.UnixTimeStampToDateTime();

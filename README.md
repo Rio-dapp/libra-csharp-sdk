@@ -17,7 +17,7 @@ git clone https://github.com/Rio-dapp/libra-csharp-sdk.git
 1. Get Account Info
 2. Get Transactions
 3. Get Transactions by Seqenc number
-4. Send Transaction - TO DO (with LCS)
+4. Send Transaction
 
 ## Example
 
