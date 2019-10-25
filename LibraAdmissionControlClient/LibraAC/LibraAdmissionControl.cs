@@ -89,7 +89,7 @@ namespace LibraAdmissionControlClient
             return retList;
         }
 
-        private CustomTransactionFullInfo GetCustomTransactionFullInfo(SignedTransaction transaction,
+        private CustomTransactionFullInfo GetCustomTransactionFullInfo(Transaction transaction,
             TransactionInfo info)
         {
             CustomTransactionFullInfo ret = new CustomTransactionFullInfo();
@@ -98,7 +98,7 @@ namespace LibraAdmissionControlClient
                 return ret;
 
             var customRawTransaction = new CustomRawTransaction(
-                transaction.SignedTxn.ToByteArray());
+                transaction.Transaction_.ToByteArray());
             ret.RawTransaction = customRawTransaction;
             // ret.SenderPublicKey = transaction..ToByteArray().ByteArryToString();
             // ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
@@ -182,6 +182,32 @@ namespace LibraAdmissionControlClient
                          U64 = amount
                      }
                 }
+            };
+            rawTr.Sender = new AddressLCS(sender);
+            var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);
+
+            return result.ToString();
+        }
+
+        public async Task<string> SendTransactionModule(
+        byte[] senderPrivateKey, string sender, byte[] module)
+        {
+            var senderAccount = await GetAccountInfoAsync(sender);
+
+            RawTransactionLCS rawTr = new RawTransactionLCS()
+            {
+                ExpirationTime = (ulong)DateTimeOffset.UtcNow.AddSeconds(60)
+                .ToUnixTimeSeconds(),
+                GasUnitPrice = 0,
+                MaxGasAmount = 100000,
+                SequenceNumber = senderAccount.SequenceNumber
+            };
+
+            rawTr.TransactionPayload = new TransactionPayloadLCS();
+            rawTr.TransactionPayload.PayloadType = (uint)ETransactionPayloadLCS.Module;
+            rawTr.TransactionPayload.Module = new ModuleLCS()
+            {
+                Code = module
             };
             rawTr.Sender = new AddressLCS(sender);
             var result = await _service.SendTransactionAsync(senderPrivateKey, rawTr);

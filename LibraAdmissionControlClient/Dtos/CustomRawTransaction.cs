@@ -10,6 +10,11 @@ namespace LibraAdmissionControlClient.Dtos
 {
     public class CustomRawTransaction
     {
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public uint FirestUint { get; set; }
+
         public ulong ExpirationTimeUnix { get; set; }
         public DateTime ExpirationTime { get; set; }
         public ulong GasUnitPrice { get; set; }
@@ -37,6 +42,8 @@ namespace LibraAdmissionControlClient.Dtos
             _rawTxnBytes = rawTxnBytes;
             int cursor = 0;
             RawTransactionLCS rawTr = _rawTxnBytes.LCDeserialize<RawTransactionLCS>(ref cursor);
+            ///TODO
+            FirestUint = rawTr.FirstUint;
 
             ExpirationTimeUnix = rawTr.ExpirationTime;
             ExpirationTime = rawTr.ExpirationTime.UnixTimeStampToDateTime();

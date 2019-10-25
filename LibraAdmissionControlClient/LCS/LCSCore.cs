@@ -124,9 +124,9 @@ namespace LibraAdmissionControlClient.LCS
             throw new Exception("Unsupported type.");
         }
 
-        #region Deserialization
+        #region Serialization
         /// <summary>
-        /// Libra Canonical Deserialization
+        /// Libra Canonical Serialization
         /// </summary>
         /// <returns></returns>
         public static byte[] LCSerialize(object source)

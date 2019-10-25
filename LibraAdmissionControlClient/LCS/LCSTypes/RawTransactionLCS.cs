@@ -6,12 +6,13 @@ namespace LibraAdmissionControlClient.LCS.LCSTypes
 {
     public class RawTransactionLCS
     {
-        public ulong MaxGasAmount { get; internal set; }
-        public ulong GasUnitPrice { get; internal set; }
-        public ulong ExpirationTime { get; internal set; }
-        public AddressLCS Sender { get; internal set; }
-        public ulong SequenceNumber { get; internal set; }
-        public TransactionPayloadLCS TransactionPayload { get; internal set; }
+        public ulong MaxGasAmount { get;  set; }
+        public ulong GasUnitPrice { get;  set; }
+        public ulong ExpirationTime { get;  set; }
+        public AddressLCS Sender { get;  set; }
+        public ulong SequenceNumber { get;  set; }
+        public TransactionPayloadLCS TransactionPayload { get;  set; }
+        public uint FirstUint { get; internal set; }
 
         public override string ToString()
         {

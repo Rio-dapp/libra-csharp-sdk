@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="mempool_status.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dotnetstandard-bip32" Version="1.0.0" />
     <PackageReference Include="Google.Protobuf" Version="3.8.0" />
     <PackageReference Include="Grpc" Version="1.21.0" />
@@ -24,7 +28,7 @@
 	<Protobuf Include="get_with_proof.proto" />
 	<Protobuf Include="ledger_info.proto" />
 	<Protobuf Include="mempool.proto" />
-	<Protobuf Include="shared/mempool_status.proto" />
+	<Protobuf Include="mempool_status.proto" />
 	<Protobuf Include="proof.proto" />
 	<Protobuf Include="transaction.proto" />
 	<Protobuf Include="transaction_info.proto" />

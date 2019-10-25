@@ -28,6 +28,9 @@ namespace LibraAdmissionControlClient.LCS
         {
             var retVal = new RawTransactionLCS();
 
+            //TODO
+            retVal.FirstUint = source.LCDeserialize<uint>(ref cursor);
+
             retVal.Sender = source.LCDeserialize<AddressLCS>(ref cursor);
             retVal.SequenceNumber = source.LCDeserialize<ulong>(ref cursor);
             retVal.TransactionPayload =

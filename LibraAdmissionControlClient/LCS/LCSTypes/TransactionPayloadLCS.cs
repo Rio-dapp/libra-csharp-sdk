@@ -15,8 +15,8 @@ namespace LibraAdmissionControlClient.LCS.LCSTypes
 
         public ProgramLCS Program { get; set; }
         public WriteSetLCS WriteSet { get; set; }
-        public ScriptLCS Script { get; internal set; }
-        public ModuleLCS Module { get; internal set; }
+        public ScriptLCS Script { get;  set; }
+        public ModuleLCS Module { get;  set; }
 
         public override string ToString()
         {
