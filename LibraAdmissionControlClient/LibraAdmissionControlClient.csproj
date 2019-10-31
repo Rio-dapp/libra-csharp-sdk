@@ -27,7 +27,6 @@
 	<Protobuf Include="events.proto" />
 	<Protobuf Include="get_with_proof.proto" />
 	<Protobuf Include="ledger_info.proto" />
-	<Protobuf Include="mempool.proto" />
 	<Protobuf Include="mempool_status.proto" />
 	<Protobuf Include="proof.proto" />
 	<Protobuf Include="transaction.proto" />

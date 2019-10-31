@@ -77,10 +77,10 @@ namespace LibraAdmissionControlClient
             for (int i = 0; i < transactions.Transactions.Count; i++)
             {
                 var transaction = transactions.Transactions[i];
-                var info = transactions.Infos[i];
+                var info = transactions.Proof.TransactionInfos[i];
 
                 CustomTransactionFullInfo ret = GetCustomTransactionFullInfo(transaction,
-                    info);
+                  info);
                 ret.Version = startVersion + (ulong)i;
                 retList.Add(ret);
             }
@@ -102,15 +102,13 @@ namespace LibraAdmissionControlClient
             ret.RawTransaction = customRawTransaction;
             // ret.SenderPublicKey = transaction..ToByteArray().ByteArryToString();
             // ret.SenderSignature = transaction.SenderSignature.ToByteArray().ByteArryToString();
+
             if (info != null)
                 ret.GasUsed = info.GasUsed;
             else
                 ret.GasUsed = 0;
 
-
-
             return ret;
-
         }
 
         public async Task<CustomTransactionFullInfo> GetTransactionAsync(
@@ -120,7 +118,7 @@ namespace LibraAdmissionControlClient
 
             CustomTransactionFullInfo ret = GetCustomTransactionFullInfo(
                 transactions.Transactions.FirstOrDefault(),
-                transactions.Infos.FirstOrDefault());
+                transactions.Proof.TransactionInfos.FirstOrDefault());
             ret.Version = transactions.FirstTransactionVersion.Value;
             return ret;
         }
@@ -136,9 +134,9 @@ namespace LibraAdmissionControlClient
             if (transaction == null)
                 return null;
 
-            var trx = transaction.SignedTransaction;
+            var trx = transaction.Transaction;
             var customRawTransaction = new CustomRawTransaction(
-                trx.SignedTxn.ToByteArray());
+                trx.Transaction_.ToByteArray());
             return customRawTransaction;
         }
 

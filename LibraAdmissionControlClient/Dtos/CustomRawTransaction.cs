@@ -40,6 +40,7 @@ namespace LibraAdmissionControlClient.Dtos
         private void DeserializeRawTransaction(byte[] rawTxnBytes)
         {
             _rawTxnBytes = rawTxnBytes;
+
             int cursor = 0;
             RawTransactionLCS rawTr = _rawTxnBytes.LCDeserialize<RawTransactionLCS>(ref cursor);
             ///TODO

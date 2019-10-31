@@ -99,8 +99,6 @@ namespace LibraAdmissionControlClient
             updateToLatestLedgerRequest.RequestedItems.Add(requestItem);
             var result = await _client.UpdateToLatestLedgerAsync(
                 updateToLatestLedgerRequest, new Metadata());
-            //Console.WriteLine("result = " + result.ResponseItems.Count);
-            //Console.WriteLine("result = " + result.ResponseItems.FirstOrDefault());
 
             List<CustomRawTransaction> retList = new List<CustomRawTransaction>();
             foreach (var item in result.ResponseItems)
@@ -109,7 +107,7 @@ namespace LibraAdmissionControlClient
             return null;
         }
 
-        public async Task<Types.SignedTransactionWithProof> 
+        public async Task<TransactionWithProof> 
             GetTransactionsBySequenceNumberAsync(
            string address, ulong sequenceNumber)
         {
@@ -129,7 +127,7 @@ namespace LibraAdmissionControlClient
 
             foreach (var item in result.ResponseItems)
                 return item.GetAccountTransactionBySequenceNumberResponse
-                    .SignedTransactionWithProof;
+                    .TransactionWithProof;
 
             return null;
         }
@@ -140,6 +138,10 @@ namespace LibraAdmissionControlClient
             byte[] privateKey, RawTransactionLCS rawTransaction)
         {
             var bytesTrx = LCSCore.LCSerialize(rawTransaction);
+            //Console.WriteLine();
+            //Console.WriteLine(bytesTrx.ByteArryToString());
+            //Console.WriteLine();
+
             LibraHasher libraHasher = new LibraHasher(EHashType.RawTransaction);
             var hash = libraHasher.GetHash(bytesTrx);
 
@@ -148,7 +150,7 @@ namespace LibraAdmissionControlClient
             AdmissionControl.SubmitTransactionRequest req =
                 new AdmissionControl.SubmitTransactionRequest();
             
-            req.SignedTxn = new SignedTransaction();
+            req.Transaction = new SignedTransaction();
 
             List<byte> retArr = new List<byte>();
             retArr = retArr.Concat(bytesTrx).ToList();
@@ -156,7 +158,7 @@ namespace LibraAdmissionControlClient
                 LCSCore.LCSerialize(key.Export(KeyBlobFormat.RawPublicKey))).ToList();
             var sig = SignatureAlgorithm.Ed25519.Sign(key, hash);
             retArr = retArr.Concat(LCSCore.LCSerialize(sig)).ToList();
-            req.SignedTxn.SignedTxn = ByteString.CopyFrom(retArr.ToArray());
+            req.Transaction.TxnBytes = ByteString.CopyFrom(retArr.ToArray());
 
             var result = await _client.SubmitTransactionAsync(
                  req, new Metadata());

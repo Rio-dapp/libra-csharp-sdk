@@ -130,7 +130,8 @@ namespace LibraAdmissionControlClient.LCS
         public AddressLCS GetAddress(byte[] source, ref int cursor)
         {
             var retVal = new AddressLCS();
-            retVal.Length = Read_u32(source, ref cursor);
+            retVal.Length = 32;// Read_u32(source, ref cursor);
+           // retVal.Length = Read_u32(source, ref cursor);
 
             retVal.ValueByte = Read_u8(source, ref cursor, (int)retVal.Length)
                 .ToArray();

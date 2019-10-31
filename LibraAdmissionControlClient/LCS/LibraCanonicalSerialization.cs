@@ -15,10 +15,10 @@ namespace LibraAdmissionControlClient.LCS
 
         public byte[] AddressToByte(AddressLCS source)
         {
-            List<byte> retArr = new List<byte>();
-            var len = U32ToByte((uint)source.Length);
+            // var len = U32ToByte((uint)source.Length);
             var data = source.Value.HexStringToByteArray();
-            return len.Concat(data).ToArray();
+            // return len.Concat(data).ToArray();
+            return data;
         }
 
         public byte[] U32ToByte(uint source)
@@ -155,6 +155,10 @@ namespace LibraAdmissionControlClient.LCS
         public byte[] RawTransactionToByte(RawTransactionLCS source)
         {
             List<byte> retArr = new List<byte>();
+            //TO-DO
+            var firstUint = U32ToByte(source.FirstUint);
+            retArr = retArr.Concat(firstUint).ToList();
+
             var sender = LCSCore.LCSerialize(source.Sender);
             retArr = retArr.Concat(sender).ToList();
 
