@@ -4,41 +4,37 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="mempool_status.proto" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="dotnetstandard-bip32" Version="1.0.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
-    <PackageReference Include="Grpc" Version="1.21.0" />
-    <PackageReference Include="Grpc.Core" Version="1.21.0" />
-    <PackageReference Include="Grpc.Tools" Version="1.21.0">
+    <PackageReference Include="Google.Protobuf" Version="3.10.1" />
+    <PackageReference Include="Grpc" Version="2.24.0" />
+    <PackageReference Include="Grpc.Core" Version="2.24.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.24.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NSec.Cryptography" Version="19.5.0" />
     <PackageReference Include="Waher.Security.SHA3" Version="1.0.1" />
-	
-	<Protobuf Include="admission_control.proto" />
-	<Protobuf Include="access_path.proto" />
-	<Protobuf Include="account_state_blob.proto" />
-	<Protobuf Include="events.proto" />
-	<Protobuf Include="get_with_proof.proto" />
-	<Protobuf Include="ledger_info.proto" />
-	<Protobuf Include="mempool_status.proto" />
-	<Protobuf Include="proof.proto" />
-	<Protobuf Include="transaction.proto" />
-	<Protobuf Include="transaction_info.proto" />
-	<Protobuf Include="validator_change.proto" />
-	<Protobuf Include="validator_public_keys.proto" />
-	<Protobuf Include="validator_set.proto" />
-	<Protobuf Include="language_storage.proto" />
-	<Protobuf Include="vm_errors.proto" />
-	
-	
-	
-  </ItemGroup>
+ </ItemGroup>
 
+  <ItemGroup>
+    <Protobuf Include="Proto\access_path.proto" />
+    <Protobuf Include="Proto\account_state_blob.proto"  />
+    <Protobuf Include="Proto\admission_control.proto"  />
+    <Protobuf Include="Proto\events.proto"  />
+    <Protobuf Include="Proto\get_with_proof.proto"  />
+    <Protobuf Include="Proto\language_storage.proto"  />
+    <Protobuf Include="Proto\ledger_info.proto"  />
+    <Protobuf Include="Proto\mempool_status.proto" />
+    <Protobuf Include="Proto\proof.proto"  />
+    <Protobuf Include="Proto\transaction.proto"  />
+    <Protobuf Include="Proto\transaction_info.proto"/>
+    <Protobuf Include="Proto\validator_change.proto"  />
+    <Protobuf Include="Proto\validator_public_keys.proto" />
+    <Protobuf Include="Proto\validator_set.proto" />
+    <Protobuf Include="Proto\vm_errors.proto"  />
+  </ItemGroup>
+ 
 </Project>

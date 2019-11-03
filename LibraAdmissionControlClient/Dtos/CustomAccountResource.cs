@@ -40,6 +40,7 @@ namespace LibraAdmissionControlClient.Dtos
         {
             _rawBytes = bytes;
 
+            Console.WriteLine("Bytes - " + bytes.ByteArryToString());
 
             int startIndex = GetAssetTypeStartIndex();
 

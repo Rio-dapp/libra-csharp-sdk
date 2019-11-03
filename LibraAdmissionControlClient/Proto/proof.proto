@@ -5,7 +5,7 @@ syntax = "proto3";
 
 package types;
 
-import "transaction_info.proto";
+import "Proto/transaction_info.proto";
 
 message AccumulatorProof {
   // The siblings. The ones near the leaf are at the beginning of the list. The
